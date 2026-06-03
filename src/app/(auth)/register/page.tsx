@@ -60,21 +60,21 @@ export default function RegisterPage() {
   };
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
-      <Box bg="white" p={8} rounded="lg" shadow="md" w="full" maxW="md">
+    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="bg">
+      <Box bg="bg.panel" borderWidth="1px" borderColor="border" p={8} rounded="lg" shadow="md" w="full" maxW="md">
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={6}>
             <Heading size="xl" textAlign="center">Create account</Heading>
 
             {errorMsg && (
-              <Box bg="red.50" border="1px solid" borderColor="red.200" rounded="md" p={3}>
-                <Text color="red.600" fontSize="sm">{errorMsg}</Text>
+              <Box bg="red.subtle" borderWidth="1px" borderColor="red.muted" rounded="md" p={3}>
+                <Text color="red.fg" fontSize="sm">{errorMsg}</Text>
               </Box>
             )}
 
             {successMsg && (
-              <Box bg="green.50" border="1px solid" borderColor="green.200" rounded="md" p={3}>
-                <Text color="green.600" fontSize="sm">{successMsg}</Text>
+              <Box bg="green.subtle" borderWidth="1px" borderColor="green.muted" rounded="md" p={3}>
+                <Text color="green.fg" fontSize="sm">{successMsg}</Text>
               </Box>
             )}
 
@@ -125,9 +125,9 @@ export default function RegisterPage() {
               </>
             )}
 
-            <Text fontSize="sm" textAlign="center" color="gray.500">
+            <Text fontSize="sm" textAlign="center" color="fg.muted">
               Already have an account?{" "}
-              <Link href="/login" color="blue.500" fontWeight="medium">
+              <Link href="/login" color="blue.fg" fontWeight="medium">
                 Sign in
               </Link>
             </Text>

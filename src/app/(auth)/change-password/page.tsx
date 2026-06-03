@@ -48,20 +48,20 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
-      <Box bg="white" p={8} rounded="lg" shadow="md" w="full" maxW="md">
+    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="bg">
+      <Box bg="bg.panel" borderWidth="1px" borderColor="border" p={8} rounded="lg" shadow="md" w="full" maxW="md">
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={6}>
             <Stack gap={1}>
               <Heading size="xl" textAlign="center">Set new password</Heading>
-              <Text fontSize="sm" textAlign="center" color="gray.500">
+              <Text fontSize="sm" textAlign="center" color="fg.muted">
                 Your password is temporary. Please set a new one to continue.
               </Text>
             </Stack>
 
             {errorMsg && (
-              <Box bg="red.50" border="1px solid" borderColor="red.200" rounded="md" p={3}>
-                <Text color="red.600" fontSize="sm">{errorMsg}</Text>
+              <Box bg="red.subtle" borderWidth="1px" borderColor="red.muted" rounded="md" p={3}>
+                <Text color="red.fg" fontSize="sm">{errorMsg}</Text>
               </Box>
             )}
 

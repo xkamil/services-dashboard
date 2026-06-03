@@ -8,7 +8,8 @@
       "Bash(node -e \"const c = require\\('@chakra-ui/react'\\); console.log\\(Object.keys\\(c\\).filter\\(k => k.toLowerCase\\(\\).includes\\('provider'\\) || k.toLowerCase\\(\\).includes\\('chakra'\\)\\)\\)\")",
       "Bash(node -e \"const c = require\\('@chakra-ui/react'\\); console.log\\('Link' in c, 'ChakraLink' in c\\)\")",
       "Bash(node -e \"const c = require\\('@chakra-ui/react'\\); console.log\\('defaultSystem' in c, 'defaultConfig' in c, 'createSystem' in c\\)\")",
-      "Bash(npm ls *)"
+      "Bash(npm ls *)",
+      "Bash(node -e \"const c = require\\('@chakra-ui/react'\\); const tokens = c.defaultSystem.tokens.getByName\\('colors.bg.panel'\\); console.log\\('bg.panel:', tokens ? 'exists' : 'missing'\\); console.log\\('bg.subtle:', c.defaultSystem.tokens.getByName\\('colors.bg.subtle'\\) ? 'exists' : 'missing'\\); console.log\\('fg.muted:', c.defaultSystem.tokens.getByName\\('colors.fg.muted'\\) ? 'exists' : 'missing'\\); console.log\\('blue.fg:', c.defaultSystem.tokens.getByName\\('colors.blue.fg'\\) ? 'exists' : 'missing'\\);\")"
     ]
   }
 }

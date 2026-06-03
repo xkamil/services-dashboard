@@ -52,15 +52,15 @@ export default function LoginPage() {
   };
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
-      <Box bg="white" p={8} rounded="lg" shadow="md" w="full" maxW="md">
+    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="bg">
+      <Box bg="bg.panel" borderWidth="1px" borderColor="border" p={8} rounded="lg" shadow="md" w="full" maxW="md">
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={6}>
             <Heading size="xl" textAlign="center">Sign in</Heading>
 
             {errorMsg && (
-              <Box bg="red.50" border="1px solid" borderColor="red.200" rounded="md" p={3}>
-                <Text color="red.600" fontSize="sm">{errorMsg}</Text>
+              <Box bg="red.subtle" borderWidth="1px" borderColor="red.muted" rounded="md" p={3}>
+                <Text color="red.fg" fontSize="sm">{errorMsg}</Text>
               </Box>
             )}
 
@@ -95,9 +95,9 @@ export default function LoginPage() {
               Sign in
             </Button>
 
-            <Text fontSize="sm" textAlign="center" color="gray.500">
+            <Text fontSize="sm" textAlign="center" color="fg.muted">
               Don&apos;t have an account?{" "}
-              <Link href="/register" color="blue.500" fontWeight="medium">
+              <Link href="/register" color="blue.fg" fontWeight="medium">
                 Register
               </Link>
             </Text>
