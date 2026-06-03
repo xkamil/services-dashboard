@@ -1,10 +1,5 @@
-import { Heading, Stack, Text } from "@chakra-ui/react";
+import { redirect } from "next/navigation";
 
 export default function AdminPage() {
-  return (
-    <Stack gap={2}>
-      <Heading size="2xl">Admin</Heading>
-      <Text color="fg.muted">Administrator area.</Text>
-    </Stack>
-  );
+  redirect("/admin/users");
 }
