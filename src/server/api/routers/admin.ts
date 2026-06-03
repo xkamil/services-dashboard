@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import { generateTemporaryPassword } from "~/lib/password";
 import {
+  auditLogListSchema,
   deleteUserSchema,
   resetPasswordSchema,
   updateUserStatusSchema,
@@ -62,6 +63,16 @@ const usersRouter = createTRPCRouter({
     }),
 });
 
+const auditRouter = createTRPCRouter({
+  list: adminProcedure.input(auditLogListSchema).query(({ ctx, input }) => {
+    return ctx.db.auditLog.findMany({
+      where: { createdAt: { gte: input.from, lte: input.to } },
+      orderBy: { createdAt: "desc" },
+    });
+  }),
+});
+
 export const adminRouter = createTRPCRouter({
   users: usersRouter,
+  audit: auditRouter,
 });

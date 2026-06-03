@@ -3,7 +3,10 @@ import { type ReactNode } from "react";
 
 import { Navbar, SECTIONS, type NavLink } from "~/app/_components/navbar";
 
-const adminLinks: NavLink[] = [{ href: "/admin/users", label: "Users" }];
+const adminLinks: NavLink[] = [
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/changelog", label: "Changelog" },
+];
 
 export default function AdminLayout({
   children,

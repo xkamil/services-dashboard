@@ -58,7 +58,13 @@ export function Navbar({
                         display="inline-flex"
                         alignItems="center"
                         rounded="none"
+                        outline="none"
                         _hover={{ color: "fg", textDecoration: "none" }}
+                        _focusVisible={{
+                          outline: "none",
+                          color: "fg",
+                          borderColor: "fg",
+                        }}
                       >
                         <NextLink href={link.href}>{link.label}</NextLink>
                       </Link>

@@ -2,6 +2,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
+import { recordAuditLog } from "~/server/audit";
 import { getSession } from "~/server/auth";
 import { db } from "~/server/db";
 
@@ -55,20 +56,41 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
-export const publicProcedure = t.procedure.use(timingMiddleware);
+// Records every successful mutation to the audit log (the changelog). Runs
+// before auth so the actor reflects the caller's session at request time.
+const auditMiddleware = t.middleware(
+  async ({ ctx, next, path, type, getRawInput }) => {
+    const result = await next();
 
-export const protectedProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(({ ctx, next }) => {
-    if (!ctx.session) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
+    if (type === "mutation" && result.ok) {
+      const input = await getRawInput();
+      await recordAuditLog(ctx.db, {
+        action: path,
+        actor: ctx.session
+          ? { userId: ctx.session.userId, email: ctx.session.email }
+          : null,
+        input,
+      });
     }
-    return next({
-      ctx: {
-        session: ctx.session,
-      },
-    });
+
+    return result;
+  },
+);
+
+const baseProcedure = t.procedure.use(timingMiddleware).use(auditMiddleware);
+
+export const publicProcedure = baseProcedure;
+
+export const protectedProcedure = baseProcedure.use(({ ctx, next }) => {
+  if (!ctx.session) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      session: ctx.session,
+    },
   });
+});
 
 export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.session.role !== "ADMIN") {

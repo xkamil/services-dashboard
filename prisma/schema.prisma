@@ -18,3 +18,14 @@ model User {
     createdAt           DateTime @default(now())
     updatedAt           DateTime @updatedAt
 }
+
+model AuditLog {
+    id        String   @id @default(cuid())
+    action    String // tRPC mutation path, e.g. "admin.users.updateStatus"
+    userId    String? // actor id, null when unauthenticated
+    userEmail String? // actor email snapshot at the time of the action
+    input     String? // sanitized JSON of the mutation input
+    createdAt DateTime @default(now())
+
+    @@index([createdAt])
+}

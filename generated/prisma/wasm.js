@@ -101,14 +101,29 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  userId: 'userId',
+  userEmail: 'userEmail',
+  input: 'input',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
-  User: 'User'
+  User: 'User',
+  AuditLog: 'AuditLog'
 };
 /**
  * Create the Client
@@ -149,6 +164,7 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -157,13 +173,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id                  String   @id @default(cuid())\n  email               String   @unique\n  passwordHash        String\n  isTemporaryPassword Boolean  @default(false)\n  status              String   @default(\"PENDING_VERIFICATION\") // ACTIVE | BLOCKED | PENDING_VERIFICATION\n  role                String   @default(\"USER\") // USER | ADMIN\n  createdAt           DateTime @default(now())\n  updatedAt           DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "e4f40ada1fee224c8a481306fe894279170301e4f9c6e37280bd20fe92c0134f",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id                  String   @id @default(cuid())\n  email               String   @unique\n  passwordHash        String\n  isTemporaryPassword Boolean  @default(false)\n  status              String   @default(\"PENDING_VERIFICATION\") // ACTIVE | BLOCKED | PENDING_VERIFICATION\n  role                String   @default(\"USER\") // USER | ADMIN\n  createdAt           DateTime @default(now())\n  updatedAt           DateTime @updatedAt\n}\n\nmodel AuditLog {\n  id        String   @id @default(cuid())\n  action    String // tRPC mutation path, e.g. \"admin.users.updateStatus\"\n  userId    String? // actor id, null when unauthenticated\n  userEmail String? // actor email snapshot at the time of the action\n  input     String? // sanitized JSON of the mutation input\n  createdAt DateTime @default(now())\n\n  @@index([createdAt])\n}\n",
+  "inlineSchemaHash": "3e1e5a51090c06f8e607b276d5ecf24559684005aa168959692a02a22f894b9a",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isTemporaryPassword\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isTemporaryPassword\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"AuditLog\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userEmail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"input\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

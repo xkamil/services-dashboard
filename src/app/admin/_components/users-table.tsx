@@ -15,6 +15,7 @@ import {
 import { useMemo, useState } from "react";
 
 import { StatusBadge } from "~/app/_components/status-badge";
+import { formatDateTime } from "~/lib/format";
 import { type UserStatus, userStatusSchema } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
@@ -22,22 +23,12 @@ import { ChangeStatusDialog } from "./change-status-dialog";
 import { DeleteUserDialog } from "./delete-user-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
 
-type SortField = "email" | "status" | "role" | "createdAt" | "updatedAt";
+type SortField = "id" | "email" | "status" | "role" | "createdAt" | "updatedAt";
 type SortDir = "asc" | "desc";
 
 type EditingUser = { id: string; email: string; status: UserStatus };
 type DeletingUser = { id: string; email: string };
 type ResettingUser = { id: string; email: string };
-
-function formatDate(date: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const dd = pad(date.getDate());
-  const mm = pad(date.getMonth() + 1);
-  const yyyy = date.getFullYear();
-  const hh = pad(date.getHours());
-  const min = pad(date.getMinutes());
-  return `${dd}.${mm}.${yyyy}, ${hh}:${min}`;
-}
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active) return <Text as="span" opacity={0.3}>↕</Text>;
@@ -60,7 +51,7 @@ export function UsersTable() {
     const filterLower = filter.trim().toLowerCase();
     const filtered = filterLower
       ? users.filter((u) =>
-          [u.email, u.status, u.role].some((v) =>
+          [u.id, u.email, u.status, u.role].some((v) =>
             v.toLowerCase().includes(filterLower),
           ),
         )
@@ -107,7 +98,7 @@ export function UsersTable() {
   return (
     <Stack gap={4}>
       <Input
-        placeholder="Filter by email, status, or role…"
+        placeholder="Filter by ID, email, status, or role…"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         maxW="sm"
@@ -124,6 +115,7 @@ export function UsersTable() {
           <Table.Root size="sm" variant="line">
             <Table.Header>
               <Table.Row>
+                {sortableHeader("id", "User ID")}
                 {sortableHeader("email", "Email")}
                 {sortableHeader("status", "Status")}
                 {sortableHeader("role", "Role")}
@@ -135,7 +127,7 @@ export function UsersTable() {
             <Table.Body>
               {rows.length === 0 ? (
                 <Table.Row>
-                  <Table.Cell colSpan={6}>
+                  <Table.Cell colSpan={7}>
                     <Text textAlign="center" color="fg.muted" py={4}>
                       No users match the filter.
                     </Text>
@@ -146,13 +138,16 @@ export function UsersTable() {
                   const status = userStatusSchema.parse(user.status);
                   return (
                     <Table.Row key={user.id}>
+                      <Table.Cell fontFamily="mono" fontSize="xs" color="fg.muted">
+                        {user.id}
+                      </Table.Cell>
                       <Table.Cell>{user.email}</Table.Cell>
                       <Table.Cell>
                         <StatusBadge status={status} />
                       </Table.Cell>
                       <Table.Cell>{user.role}</Table.Cell>
-                      <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
-                      <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
+                      <Table.Cell>{formatDateTime(user.createdAt)}</Table.Cell>
+                      <Table.Cell>{formatDateTime(user.updatedAt)}</Table.Cell>
                       <Table.Cell textAlign="end">
                         <Menu.Root>
                           <Menu.Trigger asChild>
