@@ -20,17 +20,24 @@ import { api } from "~/trpc/react";
 
 import { ChangeStatusDialog } from "./change-status-dialog";
 import { DeleteUserDialog } from "./delete-user-dialog";
+import { ResetPasswordDialog } from "./reset-password-dialog";
 
 type SortField = "email" | "status" | "role" | "createdAt" | "updatedAt";
 type SortDir = "asc" | "desc";
 
 type EditingUser = { id: string; email: string; status: UserStatus };
 type DeletingUser = { id: string; email: string };
+type ResettingUser = { id: string; email: string };
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
+function formatDate(date: Date) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const dd = pad(date.getDate());
+  const mm = pad(date.getMonth() + 1);
+  const yyyy = date.getFullYear();
+  const hh = pad(date.getHours());
+  const min = pad(date.getMinutes());
+  return `${dd}.${mm}.${yyyy}, ${hh}:${min}`;
+}
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active) return <Text as="span" opacity={0.3}>↕</Text>;
@@ -45,6 +52,7 @@ export function UsersTable() {
   const [filter, setFilter] = useState("");
   const [editing, setEditing] = useState<EditingUser | null>(null);
   const [deleting, setDeleting] = useState<DeletingUser | null>(null);
+  const [resetting, setResetting] = useState<ResettingUser | null>(null);
 
   const rows = useMemo(() => {
     if (!users) return [];
@@ -143,12 +151,8 @@ export function UsersTable() {
                         <StatusBadge status={status} />
                       </Table.Cell>
                       <Table.Cell>{user.role}</Table.Cell>
-                      <Table.Cell>
-                        {dateFormatter.format(user.createdAt)}
-                      </Table.Cell>
-                      <Table.Cell>
-                        {dateFormatter.format(user.updatedAt)}
-                      </Table.Cell>
+                      <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
+                      <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
                       <Table.Cell textAlign="end">
                         <Menu.Root>
                           <Menu.Trigger asChild>
@@ -176,6 +180,17 @@ export function UsersTable() {
                                   }
                                 >
                                   Change status
+                                </Menu.Item>
+                                <Menu.Item
+                                  value="reset-password"
+                                  onSelect={() =>
+                                    setResetting({
+                                      id: user.id,
+                                      email: user.email,
+                                    })
+                                  }
+                                >
+                                  Reset password
                                 </Menu.Item>
                                 <Menu.Separator />
                                 <Menu.Item
@@ -207,6 +222,10 @@ export function UsersTable() {
 
       <ChangeStatusDialog user={editing} onClose={() => setEditing(null)} />
       <DeleteUserDialog user={deleting} onClose={() => setDeleting(null)} />
+      <ResetPasswordDialog
+        user={resetting}
+        onClose={() => setResetting(null)}
+      />
     </Stack>
   );
 }

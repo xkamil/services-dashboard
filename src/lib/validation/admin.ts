@@ -16,3 +16,7 @@ export const updateUserStatusSchema = z.object({
 export const deleteUserSchema = z.object({
   userId: z.string().min(1),
 });
+
+export const resetPasswordSchema = z.object({
+  userId: z.string().min(1),
+});

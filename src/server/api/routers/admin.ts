@@ -1,6 +1,12 @@
+import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
 
-import { deleteUserSchema, updateUserStatusSchema } from "~/lib/validation/admin";
+import { generateTemporaryPassword } from "~/lib/password";
+import {
+  deleteUserSchema,
+  resetPasswordSchema,
+  updateUserStatusSchema,
+} from "~/lib/validation/admin";
 import { adminProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 const usersRouter = createTRPCRouter({
@@ -39,6 +45,20 @@ const usersRouter = createTRPCRouter({
       }
       await ctx.db.user.delete({ where: { id: input.userId } });
       return { success: true };
+    }),
+
+  resetPassword: adminProcedure
+    .input(resetPasswordSchema)
+    .mutation(async ({ ctx, input }) => {
+      const password = generateTemporaryPassword();
+      const passwordHash = await bcrypt.hash(password, 12);
+
+      await ctx.db.user.update({
+        where: { id: input.userId },
+        data: { passwordHash, isTemporaryPassword: true },
+      });
+
+      return { password };
     }),
 });
 
