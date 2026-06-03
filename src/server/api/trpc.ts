@@ -56,13 +56,14 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
-// Records every successful mutation to the audit log (the changelog). Runs
+// Records successful admin mutations to the audit log (the changelog). Runs
 // before auth so the actor reflects the caller's session at request time.
 const auditMiddleware = t.middleware(
   async ({ ctx, next, path, type, getRawInput }) => {
     const result = await next();
 
-    if (type === "mutation" && result.ok) {
+    // Only admin actions are recorded in the changelog.
+    if (type === "mutation" && result.ok && path.startsWith("admin.")) {
       const input = await getRawInput();
       await recordAuditLog(ctx.db, {
         action: path,
