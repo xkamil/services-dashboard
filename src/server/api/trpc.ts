@@ -69,3 +69,10 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.session.role !== "ADMIN") {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({ ctx });
+});

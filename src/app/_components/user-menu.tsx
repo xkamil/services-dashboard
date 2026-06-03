@@ -60,10 +60,14 @@ export function UserMenu() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Admin
+                  Admin panel
                 </NextLink>
               </Menu.Item>
             )}
+            <Menu.Item value="change-password" asChild>
+              <NextLink href="/change-password">Change password</NextLink>
+            </Menu.Item>
+            <Menu.Separator />
             <Menu.Item
               value="logout"
               onSelect={() => logout.mutate()}
