@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useRef } from "react";
 
+import { showErrorToast, showSuccessToast } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
 type ResettingUser = { id: string; email: string };
@@ -26,7 +27,22 @@ export function ResetPasswordDialog({ user, onClose }: Props) {
   if (user) lastUserRef.current = user;
   const displayUser = user ?? lastUserRef.current;
 
-  const resetPassword = api.admin.users.resetPassword.useMutation();
+  const resetPassword = api.admin.users.resetPassword.useMutation({
+    onSuccess: () => {
+      const email = lastUserRef.current?.email;
+      showSuccessToast("Password reset", {
+        description: email
+          ? `A temporary password was generated for ${email}.`
+          : undefined,
+      });
+    },
+    onError: (error) => {
+      showErrorToast("Could not reset password", {
+        description: "Failed to reset the password. Please try again.",
+        details: error.message,
+      });
+    },
+  });
   const generatedPassword = resetPassword.data?.password;
 
   const handleClose = () => {
@@ -87,21 +103,14 @@ export function ResetPasswordDialog({ user, onClose }: Props) {
                   </Text>
                 </Stack>
               ) : (
-                <Stack gap={3}>
-                  <Text>
-                    Are you sure you want to reset the password for{" "}
-                    <Text as="span" fontWeight="medium">
-                      {displayUser?.email}
-                    </Text>
-                    ? Their current password will stop working and a new
-                    temporary password will be generated.
+                <Text>
+                  Are you sure you want to reset the password for{" "}
+                  <Text as="span" fontWeight="medium">
+                    {displayUser?.email}
                   </Text>
-                  {resetPassword.isError && (
-                    <Text fontSize="sm" color="red.fg">
-                      Failed to reset password. Please try again.
-                    </Text>
-                  )}
-                </Stack>
+                  ? Their current password will stop working and a new temporary
+                  password will be generated.
+                </Text>
               )}
             </Dialog.Body>
             <Dialog.Footer>

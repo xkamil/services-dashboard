@@ -3,6 +3,8 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { ThemeProvider } from "next-themes";
 
+import { Toaster } from "~/app/_components/toaster";
+
 export function UIProvider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
@@ -10,7 +12,10 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
       forcedTheme="dark"
       disableTransitionOnChange
     >
-      <ChakraProvider value={defaultSystem}>{children}</ChakraProvider>
+      <ChakraProvider value={defaultSystem}>
+        {children}
+        <Toaster />
+      </ChakraProvider>
     </ThemeProvider>
   );
 }

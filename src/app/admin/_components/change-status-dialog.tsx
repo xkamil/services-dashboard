@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 
+import { showErrorToast, showSuccessToast } from "~/lib/toast";
 import { type UserStatus, userStatusSchema } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
@@ -41,7 +42,17 @@ export function ChangeStatusDialog({ user, onClose }: Props) {
   const updateStatus = api.admin.users.updateStatus.useMutation({
     onSuccess: async () => {
       await utils.admin.users.list.invalidate();
+      const email = lastUserRef.current?.email;
       onClose();
+      showSuccessToast("Status updated", {
+        description: email ? `${email} is now ${status}.` : undefined,
+      });
+    },
+    onError: (error) => {
+      showErrorToast("Could not update status", {
+        description: "Failed to update the user status. Please try again.",
+        details: error.message,
+      });
     },
   });
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { Button, Dialog, Portal, Stack, Text } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { Button, Dialog, Portal, Text } from "@chakra-ui/react";
+import { useRef } from "react";
 
+import { showErrorToast, showSuccessToast } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
 type DeletingUser = { id: string; email: string };
@@ -13,7 +14,6 @@ type Props = {
 };
 
 export function DeleteUserDialog({ user, onClose }: Props) {
-  const [errorMsg, setErrorMsg] = useState("");
   const lastUserRef = useRef<DeletingUser | null>(null);
   if (user) lastUserRef.current = user;
   const displayUser = user ?? lastUserRef.current;
@@ -22,14 +22,21 @@ export function DeleteUserDialog({ user, onClose }: Props) {
   const deleteUser = api.admin.users.delete.useMutation({
     onSuccess: async () => {
       await utils.admin.users.list.invalidate();
+      const email = lastUserRef.current?.email;
       onClose();
+      showSuccessToast("User deleted", {
+        description: email ? `${email} has been removed.` : undefined,
+      });
     },
     onError: (error) => {
-      if (error.message === "CANNOT_DELETE_SELF") {
-        setErrorMsg("You cannot delete your own account.");
-      } else {
-        setErrorMsg("Failed to delete user. Please try again.");
-      }
+      const description =
+        error.message === "CANNOT_DELETE_SELF"
+          ? "You cannot delete your own account."
+          : "Failed to delete user. Please try again.";
+      showErrorToast("Could not delete user", {
+        description,
+        details: error.message,
+      });
     },
   });
 
@@ -37,10 +44,7 @@ export function DeleteUserDialog({ user, onClose }: Props) {
     <Dialog.Root
       open={!!user}
       onOpenChange={(e) => {
-        if (!e.open) {
-          setErrorMsg("");
-          onClose();
-        }
+        if (!e.open) onClose();
       }}
       role="alertdialog"
     >
@@ -52,20 +56,13 @@ export function DeleteUserDialog({ user, onClose }: Props) {
               <Dialog.Title>Delete user</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
-              <Stack gap={3}>
-                <Text>
-                  Are you sure you want to delete{" "}
-                  <Text as="span" fontWeight="medium">
-                    {displayUser?.email}
-                  </Text>
-                  ? This action cannot be undone.
+              <Text>
+                Are you sure you want to delete{" "}
+                <Text as="span" fontWeight="medium">
+                  {displayUser?.email}
                 </Text>
-                {errorMsg && (
-                  <Text fontSize="sm" color="red.fg">
-                    {errorMsg}
-                  </Text>
-                )}
-              </Stack>
+                ? This action cannot be undone.
+              </Text>
             </Dialog.Body>
             <Dialog.Footer>
               <Button variant="ghost" onClick={onClose}>
@@ -76,7 +73,6 @@ export function DeleteUserDialog({ user, onClose }: Props) {
                 loading={deleteUser.isPending}
                 onClick={() => {
                   if (displayUser) {
-                    setErrorMsg("");
                     deleteUser.mutate({ userId: displayUser.id });
                   }
                 }}
