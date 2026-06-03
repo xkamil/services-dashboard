@@ -3,9 +3,9 @@ import { type ReactNode } from "react";
 
 import { Navbar, type NavLink } from "~/app/_components/navbar";
 
-const links: NavLink[] = [{ href: "/", label: "Dashboard" }];
+const links: NavLink[] = [{ href: "/admin", label: "Admin" }];
 
-export default function DashboardLayout({
+export default function AdminLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (

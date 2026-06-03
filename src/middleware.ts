@@ -32,6 +32,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/change-password", request.url));
   }
 
+  if (pathname.startsWith("/admin") && session.role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   return response;
 }
 

@@ -1,6 +1,15 @@
 "use client";
 
-import { Box, Button, Menu, Portal, Stack, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  IconButton,
+  Menu,
+  Portal,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 
 import { api } from "~/trpc/react";
@@ -13,14 +22,22 @@ export function UserMenu() {
   });
 
   if (!session) return null;
-  const username = session.email.split("@")[0];
+  const initial = session.email.charAt(0).toUpperCase();
+  const isAdmin = session.role === "ADMIN";
 
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
-        <Button variant="ghost" size="sm">
-          {username}
-        </Button>
+        <IconButton
+          variant="plain"
+          rounded="full"
+          aria-label="Open user menu"
+          p={0}
+        >
+          <Avatar.Root size="sm">
+            <Avatar.Fallback>{initial}</Avatar.Fallback>
+          </Avatar.Root>
+        </IconButton>
       </Menu.Trigger>
       <Portal>
         <Menu.Positioner>
@@ -36,6 +53,17 @@ export function UserMenu() {
               </Stack>
             </Box>
             <Menu.Separator />
+            {isAdmin && (
+              <Menu.Item value="admin" asChild>
+                <NextLink
+                  href="/admin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Admin
+                </NextLink>
+              </Menu.Item>
+            )}
             <Menu.Item
               value="logout"
               onSelect={() => logout.mutate()}
