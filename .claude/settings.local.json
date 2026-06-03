@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm uninstall *)",
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const c = require\\('@chakra-ui/react'\\); console.log\\(Object.keys\\(c\\).filter\\(k => k.toLowerCase\\(\\).includes\\('provider'\\) || k.toLowerCase\\(\\).includes\\('chakra'\\)\\)\\)\")",
+      "Bash(node -e \"const c = require\\('@chakra-ui/react'\\); console.log\\('Link' in c, 'ChakraLink' in c\\)\")",
+      "Bash(node -e \"const c = require\\('@chakra-ui/react'\\); console.log\\('defaultSystem' in c, 'defaultConfig' in c, 'createSystem' in c\\)\")",
+      "Bash(npm ls *)"
+    ]
+  }
+}

@@ -1,0 +1,139 @@
+"use client";
+
+import {
+  Box,
+  Button,
+  Field,
+  Heading,
+  Input,
+  Link,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import {
+  type RegisterFormInput,
+  registerFormSchema,
+} from "~/lib/validation/auth";
+import { api } from "~/trpc/react";
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  const {
+    register: formRegister,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormInput>({
+    resolver: zodResolver(registerFormSchema),
+    defaultValues: { email: "", password: "", confirmPassword: "" },
+  });
+
+  const register = api.auth.register.useMutation({
+    onSuccess: ({ isFirstUser }) => {
+      if (isFirstUser) {
+        router.push("/login");
+      } else {
+        setSuccessMsg(
+          "Account created. Please wait for an administrator to verify your account.",
+        );
+      }
+    },
+    onError: (error) => {
+      if (error.message === "EMAIL_TAKEN") {
+        setErrorMsg("An account with this email already exists.");
+      } else {
+        setErrorMsg("Registration failed. Please try again.");
+      }
+    },
+  });
+
+  const onSubmit = ({ email, password }: RegisterFormInput) => {
+    setErrorMsg("");
+    register.mutate({ email, password });
+  };
+
+  return (
+    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
+      <Box bg="white" p={8} rounded="lg" shadow="md" w="full" maxW="md">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack gap={6}>
+            <Heading size="xl" textAlign="center">Create account</Heading>
+
+            {errorMsg && (
+              <Box bg="red.50" border="1px solid" borderColor="red.200" rounded="md" p={3}>
+                <Text color="red.600" fontSize="sm">{errorMsg}</Text>
+              </Box>
+            )}
+
+            {successMsg && (
+              <Box bg="green.50" border="1px solid" borderColor="green.200" rounded="md" p={3}>
+                <Text color="green.600" fontSize="sm">{successMsg}</Text>
+              </Box>
+            )}
+
+            {!successMsg && (
+              <>
+                <Stack gap={4}>
+                  <Field.Root invalid={!!errors.email}>
+                    <Field.Label>Email</Field.Label>
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      {...formRegister("email")}
+                    />
+                    <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+                  </Field.Root>
+
+                  <Field.Root invalid={!!errors.password}>
+                    <Field.Label>Password</Field.Label>
+                    <Input
+                      type="password"
+                      placeholder="Min. 8 characters"
+                      {...formRegister("password")}
+                    />
+                    <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+                  </Field.Root>
+
+                  <Field.Root invalid={!!errors.confirmPassword}>
+                    <Field.Label>Confirm password</Field.Label>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      {...formRegister("confirmPassword")}
+                    />
+                    <Field.ErrorText>
+                      {errors.confirmPassword?.message}
+                    </Field.ErrorText>
+                  </Field.Root>
+                </Stack>
+
+                <Button
+                  type="submit"
+                  colorPalette="blue"
+                  width="full"
+                  loading={register.isPending}
+                >
+                  Register
+                </Button>
+              </>
+            )}
+
+            <Text fontSize="sm" textAlign="center" color="gray.500">
+              Already have an account?{" "}
+              <Link href="/login" color="blue.500" fontWeight="medium">
+                Sign in
+              </Link>
+            </Text>
+          </Stack>
+        </form>
+      </Box>
+    </Box>
+  );
+}
