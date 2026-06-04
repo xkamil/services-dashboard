@@ -30,6 +30,10 @@ jobs:
 
       - name: Lint & typecheck
         run: npm run check
+        env:
+          # Lint/typecheck don't run the app, so skip env validation rather than
+          # feed dummy secrets. (`next lint` loads next.config, which imports env.js.)
+          SKIP_ENV_VALIDATION: "1"
 
       - name: Build
         run: npm run build
