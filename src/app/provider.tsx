@@ -9,7 +9,8 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
-      forcedTheme="dark"
+      defaultTheme="light"
+      enableSystem={false}
       disableTransitionOnChange
     >
       <ChakraProvider value={defaultSystem}>

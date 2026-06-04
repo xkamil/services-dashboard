@@ -61,7 +61,7 @@ export function Navbar({
 
             {links.length > 0 && (
               <>
-                <Text color="border" aria-hidden>
+                <Text color="fg.muted" aria-hidden>
                   |
                 </Text>
                 <HStack gap={6} h="full" fontSize="sm">

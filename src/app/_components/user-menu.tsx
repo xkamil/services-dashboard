@@ -3,14 +3,18 @@
 import {
   Avatar,
   Box,
+  HStack,
   IconButton,
   Menu,
   Portal,
   Stack,
+  Switch,
   Text,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 import { api } from "~/trpc/react";
 
@@ -20,6 +24,11 @@ export function UserMenu() {
   const logout = api.auth.logout.useMutation({
     onSuccess: () => router.push("/login"),
   });
+
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
 
   if (!session) return null;
   const initial = session.email.charAt(0).toUpperCase();
@@ -69,7 +78,28 @@ export function UserMenu() {
             </Menu.Item>
             <Menu.Separator />
             <Menu.Item
+              value="theme"
+              closeOnSelect={false}
+              onSelect={() => setTheme(isDark ? "light" : "dark")}
+            >
+              <HStack justify="space-between" w="full">
+                <Text>Dark mode</Text>
+                <Switch.Root
+                  size="sm"
+                  checked={isDark}
+                  pointerEvents="none"
+                  aria-hidden
+                >
+                  <Switch.HiddenInput tabIndex={-1} />
+                  <Switch.Control />
+                </Switch.Root>
+              </HStack>
+            </Menu.Item>
+            <Menu.Separator />
+            <Menu.Item
               value="logout"
+              color="red.fg"
+              _hover={{ bg: "red.subtle" }}
               onSelect={() => logout.mutate()}
               disabled={logout.isPending}
             >
