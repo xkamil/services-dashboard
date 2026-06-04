@@ -23,6 +23,10 @@ import {
 } from "~/lib/validation/auth";
 import { api } from "~/trpc/react";
 
+// Roles a user may request when self-registering. SUPER_ADMIN is intentionally
+// excluded — that role is only ever assigned by an existing super admin.
+const REQUESTABLE_ROLES = ROLES.filter((role) => role !== "SUPER_ADMIN");
+
 export default function RegisterPage() {
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState("");
@@ -54,9 +58,17 @@ export default function RegisterPage() {
     },
     onError: (error) => {
       if (error.message === "EMAIL_TAKEN") {
-        setErrorMsg("An account with this email already exists.");
+        setErrorMsg(
+          "An account with this email already exists. Try signing in instead.",
+        );
+      } else if (error.data?.code === "BAD_REQUEST") {
+        setErrorMsg(
+          "Please check your details — some fields didn't pass validation.",
+        );
       } else {
-        setErrorMsg("Registration failed. Please try again.");
+        setErrorMsg(
+          "We couldn't create your account right now. Please check your connection and try again.",
+        );
       }
     },
   });
@@ -117,7 +129,7 @@ export default function RegisterPage() {
                   <Field.Label>Requested role</Field.Label>
                   <NativeSelect.Root>
                     <NativeSelect.Field {...formRegister("role")}>
-                      {ROLES.map((role) => (
+                      {REQUESTABLE_ROLES.map((role) => (
                         <option key={role} value={role}>
                           {ROLE_META[role].label}
                         </option>

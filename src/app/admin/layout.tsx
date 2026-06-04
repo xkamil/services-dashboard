@@ -1,7 +1,12 @@
 import { Box, Container } from "@chakra-ui/react";
 import { type ReactNode } from "react";
 
-import { Navbar, SECTIONS, type NavLink } from "~/app/_components/navbar";
+import {
+  Navbar,
+  SECTIONS,
+  SubNav,
+  type NavLink,
+} from "~/app/_components/navbar";
 
 const adminLinks: NavLink[] = [
   { href: "/admin/users", label: "Users" },
@@ -13,7 +18,8 @@ export default function AdminLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <Box minH="100vh" bg="bg">
-      <Navbar sections={SECTIONS} links={adminLinks} />
+      <Navbar sections={SECTIONS} />
+      <SubNav links={adminLinks} />
       <Container maxW="6xl" py={8}>
         {children}
       </Container>

@@ -2,6 +2,7 @@
 
 import {
   Avatar,
+  Badge,
   Box,
   HStack,
   IconButton,
@@ -11,13 +12,13 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
+import { Moon, Sun } from "lucide-react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-import { RoleBadge } from "~/app/_components/role-badge";
-import { ROLE_META, coerceRole, hasMinRole } from "~/lib/roles";
+import { ROLE_META, coerceRole } from "~/lib/roles";
 import { api } from "~/trpc/react";
 
 /** Border color for the menu trigger, by user role. */
@@ -41,7 +42,8 @@ export function UserMenu() {
 
   if (!session) return null;
   const initial = session.email.charAt(0).toUpperCase();
-  const isAdmin = hasMinRole(session.role, "ADMIN");
+  const knownRole = coerceRole(session.role);
+  const roleLabel = knownRole ? ROLE_META[knownRole].label : session.role;
 
   return (
     <Menu.Root>
@@ -72,17 +74,12 @@ export function UserMenu() {
                 <Text fontSize="sm" fontWeight="medium">
                   {session.email}
                 </Text>
-                <Text fontSize="xs" fontWeight="normal">
-                  {session.role}
-                </Text>
+                <Badge size="sm" variant="subtle" colorPalette="gray">
+                  {roleLabel}
+                </Badge>
               </Stack>
             </Box>
             <Menu.Separator />
-            {isAdmin && (
-              <Menu.Item value="admin" asChild>
-                <NextLink href="/admin">Admin panel</NextLink>
-              </Menu.Item>
-            )}
             <Menu.Item value="change-password" asChild>
               <NextLink href="/change-password">Change password</NextLink>
             </Menu.Item>
@@ -93,7 +90,14 @@ export function UserMenu() {
               onSelect={() => setTheme(isDark ? "light" : "dark")}
             >
               <HStack justify="space-between" w="full">
-                <Text>Dark mode</Text>
+                <HStack gap={2}>
+                  {isDark ? (
+                    <Moon size={16} aria-hidden />
+                  ) : (
+                    <Sun size={16} aria-hidden />
+                  )}
+                  <Text>Dark mode</Text>
+                </HStack>
                 <Switch.Root
                   size="sm"
                   checked={isDark}

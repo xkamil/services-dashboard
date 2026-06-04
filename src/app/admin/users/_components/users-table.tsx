@@ -12,6 +12,12 @@ import {
   Table,
   Text,
 } from "@chakra-ui/react";
+import {
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronUp,
+  MoreVertical,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { RoleBadge } from "~/app/_components/role-badge";
@@ -38,11 +44,19 @@ type ResettingUser = { id: string; email: string };
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active)
     return (
-      <Text as="span" opacity={0.3}>
-        ↕
-      </Text>
+      <Box as="span" opacity={0.4} display="inline-flex">
+        <ChevronsUpDown size={14} aria-hidden />
+      </Box>
     );
-  return <Text as="span">{dir === "asc" ? "↑" : "↓"}</Text>;
+  return (
+    <Box as="span" display="inline-flex">
+      {dir === "asc" ? (
+        <ChevronUp size={14} aria-hidden />
+      ) : (
+        <ChevronDown size={14} aria-hidden />
+      )}
+    </Box>
+  );
 }
 
 export function UsersTable() {
@@ -128,7 +142,7 @@ export function UsersTable() {
           borderWidth="1px"
           borderColor="border"
           rounded="md"
-          overflow="hidden"
+          overflowX="auto"
         >
           <Table.Root variant="line">
             <Table.Header>
@@ -188,9 +202,7 @@ export function UsersTable() {
                                 variant="ghost"
                                 aria-label="User actions"
                               >
-                                <Text as="span" fontSize="md" lineHeight="1">
-                                  ⋮
-                                </Text>
+                                <MoreVertical size={16} aria-hidden />
                               </IconButton>
                             </Menu.Trigger>
                             <Portal>

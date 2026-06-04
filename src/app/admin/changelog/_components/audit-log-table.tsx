@@ -164,7 +164,7 @@ export function AuditLogTable() {
           borderWidth="1px"
           borderColor="border"
           rounded="md"
-          overflow="hidden"
+          overflowX="auto"
         >
           <Table.Root variant="line">
             <Table.Header>

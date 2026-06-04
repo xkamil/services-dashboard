@@ -39,9 +39,15 @@ export default function LoginPage() {
       if (error.message === "ACCOUNT_BLOCKED") {
         setErrorMsg("Your account has been blocked. Contact an administrator.");
       } else if (error.message === "ACCOUNT_PENDING_VERIFICATION") {
-        setErrorMsg("Your account is pending verification.");
-      } else {
+        setErrorMsg(
+          "Your account is awaiting administrator approval. You'll be able to sign in once it's been verified.",
+        );
+      } else if (error.message === "INVALID_CREDENTIALS") {
         setErrorMsg("Invalid email or password.");
+      } else {
+        setErrorMsg(
+          "We couldn't sign you in right now. Please check your connection and try again.",
+        );
       }
     },
   });
@@ -92,12 +98,17 @@ export default function LoginPage() {
             Sign in
           </Button>
 
-          <Text fontSize="sm" textAlign="center" color="fg.muted">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" color="blue.fg" fontWeight="medium">
-              Register
-            </Link>
-          </Text>
+          <Stack gap={2}>
+            <Text fontSize="sm" textAlign="center" color="fg.muted">
+              Don&apos;t have an account?{" "}
+              <Link href="/register" color="blue.fg" fontWeight="medium">
+                Register
+              </Link>
+            </Text>
+            <Text fontSize="xs" textAlign="center" color="fg.muted">
+              Forgot your password? Contact your administrator to have it reset.
+            </Text>
+          </Stack>
         </Stack>
       </form>
     </AuthCard>

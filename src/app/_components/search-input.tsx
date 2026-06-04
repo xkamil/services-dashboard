@@ -7,6 +7,7 @@ import {
   type InputGroupProps,
   type InputProps,
 } from "@chakra-ui/react";
+import { Search } from "lucide-react";
 
 type SearchInputProps = Omit<
   InputGroupProps,
@@ -35,6 +36,7 @@ export function SearchInput({
   return (
     <InputGroup
       {...groupProps}
+      startElement={<Search size={16} aria-hidden />}
       endElement={
         value ? (
           <CloseButton
