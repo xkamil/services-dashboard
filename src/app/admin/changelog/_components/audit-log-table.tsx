@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
+import { SearchInput } from "~/app/_components/search-input";
 import { formatDateTime } from "~/lib/format";
 import { MAX_AUDIT_RANGE_DAYS } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
@@ -140,10 +141,10 @@ export function AuditLogTable() {
         </Field.Root>
         <Field.Root flex="1" minW="3xs">
           <Field.Label>Search</Field.Label>
-          <Input
+          <SearchInput
             placeholder="Filter by action, user, or details…"
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={setFilter}
           />
         </Field.Root>
       </HStack>
@@ -165,7 +166,7 @@ export function AuditLogTable() {
           rounded="md"
           overflow="hidden"
         >
-          <Table.Root size="sm" variant="line">
+          <Table.Root variant="line">
             <Table.Header>
               <Table.Row>
                 <Table.ColumnHeader>When</Table.ColumnHeader>

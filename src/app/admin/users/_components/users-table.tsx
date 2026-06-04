@@ -5,7 +5,6 @@ import {
   Box,
   HStack,
   IconButton,
-  Input,
   Menu,
   Portal,
   Skeleton,
@@ -15,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
+import { SearchInput } from "~/app/_components/search-input";
 import { StatusBadge } from "~/app/_components/status-badge";
 import { formatDateTime } from "~/lib/format";
 import { coerceUserStatus, type UserStatus } from "~/lib/validation/admin";
@@ -103,10 +103,10 @@ export function UsersTable() {
 
   return (
     <Stack gap={4}>
-      <Input
+      <SearchInput
         placeholder="Filter by ID, email, status, or role…"
         value={filter}
-        onChange={(e) => setFilter(e.target.value)}
+        onChange={setFilter}
         maxW="sm"
       />
 
@@ -123,7 +123,7 @@ export function UsersTable() {
           rounded="md"
           overflow="hidden"
         >
-          <Table.Root size="sm" variant="line">
+          <Table.Root variant="line">
             <Table.Header>
               <Table.Row>
                 {sortableHeader("id", "User ID")}
@@ -170,11 +170,7 @@ export function UsersTable() {
                       <Table.Cell textAlign="end">
                         <Menu.Root>
                           <Menu.Trigger asChild>
-                            <IconButton
-                              size="xs"
-                              variant="ghost"
-                              aria-label="User actions"
-                            >
+                            <IconButton variant="ghost" aria-label="User actions">
                               <Text as="span" fontSize="md" lineHeight="1">
                                 ⋮
                               </Text>
