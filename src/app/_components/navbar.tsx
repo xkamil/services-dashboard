@@ -4,13 +4,22 @@ import { Box, Container, Flex, HStack, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 
+import { hasMinRole, type Role } from "~/lib/roles";
+import { api } from "~/trpc/react";
+
 import { UserMenu } from "./user-menu";
 
-export type NavLink = { href: string; label: string; exact?: boolean };
+export type NavLink = {
+  href: string;
+  label: string;
+  exact?: boolean;
+  /** Minimum role required to see this link. Omitted = visible to everyone. */
+  minRole?: Role;
+};
 
 export const SECTIONS: NavLink[] = [
   { href: "/", label: "Dashboard" },
-  { href: "/admin", label: "Administration" },
+  { href: "/admin", label: "Administration", minRole: "ADMIN" },
 ];
 
 function isActive(pathname: string, link: NavLink) {
@@ -47,8 +56,17 @@ export function Navbar({
   links?: NavLink[];
 }) {
   const pathname = usePathname();
+  const { data: session } = api.auth.me.useQuery();
+
+  const canSee = (link: NavLink) =>
+    !link.minRole || (!!session && hasMinRole(session.role, link.minRole));
+
+  const visibleSections = sections.filter(canSee);
+  const visibleLinks = links.filter(canSee);
+
   const currentSection =
-    sections.find((section) => isActive(pathname, section)) ?? sections[0];
+    visibleSections.find((section) => isActive(pathname, section)) ??
+    visibleSections[0];
 
   return (
     <Box as="nav" borderBottomWidth="1px" borderColor="border" bg="bg.panel">
@@ -59,13 +77,13 @@ export function Navbar({
               {currentSection?.label}
             </Text>
 
-            {links.length > 0 && (
+            {visibleLinks.length > 0 && (
               <>
                 <Text color="fg.muted" aria-hidden>
                   |
                 </Text>
                 <HStack gap={6} h="full" fontSize="sm">
-                  {links.map((link) => (
+                  {visibleLinks.map((link) => (
                     <NavTab
                       key={link.href}
                       link={link}

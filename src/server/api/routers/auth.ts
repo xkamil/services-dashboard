@@ -34,7 +34,10 @@ export const authRouter = createTRPCRouter({
           passwordHash,
           isTemporaryPassword: false,
           status: isFirstUser ? "ACTIVE" : "PENDING_VERIFICATION",
-          role: isFirstUser ? "ADMIN" : "USER",
+          // Self-registrants get the role they requested, but it has no effect
+          // until a SUPER_ADMIN activates the account. The first user (defensive
+          // fallback; bootstrap normally beats this) becomes SUPER_ADMIN.
+          role: isFirstUser ? "SUPER_ADMIN" : input.role,
         },
       });
 

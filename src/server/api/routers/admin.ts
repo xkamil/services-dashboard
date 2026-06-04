@@ -6,9 +6,14 @@ import {
   auditLogListSchema,
   deleteUserSchema,
   resetPasswordSchema,
+  updateUserRoleSchema,
   updateUserStatusSchema,
 } from "~/lib/validation/admin";
-import { adminProcedure, createTRPCRouter } from "~/server/api/trpc";
+import {
+  adminProcedure,
+  createTRPCRouter,
+  superAdminProcedure,
+} from "~/server/api/trpc";
 
 const usersRouter = createTRPCRouter({
   list: adminProcedure.query(({ ctx }) => {
@@ -25,7 +30,7 @@ const usersRouter = createTRPCRouter({
     });
   }),
 
-  updateStatus: adminProcedure
+  updateStatus: superAdminProcedure
     .input(updateUserStatusSchema)
     .mutation(({ ctx, input }) => {
       return ctx.db.user.update({
@@ -35,7 +40,17 @@ const usersRouter = createTRPCRouter({
       });
     }),
 
-  delete: adminProcedure
+  updateRole: superAdminProcedure
+    .input(updateUserRoleSchema)
+    .mutation(({ ctx, input }) => {
+      return ctx.db.user.update({
+        where: { id: input.userId },
+        data: { role: input.role },
+        select: { id: true, role: true },
+      });
+    }),
+
+  delete: superAdminProcedure
     .input(deleteUserSchema)
     .mutation(async ({ ctx, input }) => {
       if (input.userId === ctx.session.userId) {
@@ -48,7 +63,7 @@ const usersRouter = createTRPCRouter({
       return { success: true };
     }),
 
-  resetPassword: adminProcedure
+  resetPassword: superAdminProcedure
     .input(resetPasswordSchema)
     .mutation(async ({ ctx, input }) => {
       const password = generateTemporaryPassword();
@@ -64,12 +79,14 @@ const usersRouter = createTRPCRouter({
 });
 
 const auditRouter = createTRPCRouter({
-  list: adminProcedure.input(auditLogListSchema).query(({ ctx, input }) => {
-    return ctx.db.auditLog.findMany({
-      where: { createdAt: { gte: input.from, lte: input.to } },
-      orderBy: { createdAt: "desc" },
-    });
-  }),
+  list: adminProcedure
+    .input(auditLogListSchema)
+    .query(({ ctx, input }) => {
+      return ctx.db.auditLog.findMany({
+        where: { createdAt: { gte: input.from, lte: input.to } },
+        orderBy: { createdAt: "desc" },
+      });
+    }),
 });
 
 export const adminRouter = createTRPCRouter({

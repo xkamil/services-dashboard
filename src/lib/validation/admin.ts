@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+import { ROLES } from "~/lib/roles";
+
+export const roleSchema = z.enum(ROLES);
+
 export const userStatusSchema = z.enum([
   "ACTIVE",
   "BLOCKED",
@@ -27,6 +31,11 @@ export function coerceUserStatus(value: string): UserStatus | null {
 export const updateUserStatusSchema = z.object({
   userId: z.string().min(1),
   status: userStatusSchema,
+});
+
+export const updateUserRoleSchema = z.object({
+  userId: z.string().min(1),
+  role: roleSchema,
 });
 
 export const deleteUserSchema = z.object({

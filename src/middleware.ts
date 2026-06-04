@@ -1,6 +1,7 @@
 import { getIronSession } from "iron-session";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { hasMinRole } from "~/lib/roles";
 import { type SessionData, sessionOptions } from "~/server/auth";
 
 const AUTH_PATHS = ["/login", "/register"];
@@ -33,7 +34,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/change-password", request.url));
   }
 
-  if (pathname.startsWith("/admin") && session.role !== "ADMIN") {
+  if (pathname.startsWith("/admin") && !hasMinRole(session.role, "ADMIN")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

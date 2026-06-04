@@ -2,6 +2,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
+import { hasMinRole, type Role } from "~/lib/roles";
 import { recordAuditLog } from "~/server/audit";
 import { getSession } from "~/server/auth";
 import { db } from "~/server/db";
@@ -92,9 +93,14 @@ export const protectedProcedure = baseProcedure.use(({ ctx, next }) => {
   });
 });
 
-export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.session.role !== "ADMIN") {
-    throw new TRPCError({ code: "FORBIDDEN" });
-  }
-  return next({ ctx });
-});
+/** Builds a procedure that requires the caller's role to meet or exceed `min`. */
+const roleProcedure = (min: Role) =>
+  protectedProcedure.use(({ ctx, next }) => {
+    if (!hasMinRole(ctx.session.role, min)) {
+      throw new TRPCError({ code: "FORBIDDEN" });
+    }
+    return next({ ctx });
+  });
+
+export const adminProcedure = roleProcedure("ADMIN");
+export const superAdminProcedure = roleProcedure("SUPER_ADMIN");

@@ -16,11 +16,15 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
+import { RoleBadge } from "~/app/_components/role-badge";
+import { ROLE_META, coerceRole, hasMinRole } from "~/lib/roles";
 import { api } from "~/trpc/react";
 
 /** Border color for the menu trigger, by user role. */
 function roleBorderColor(role: string) {
-  return role === "ADMIN" ? "yellow.emphasized" : "green.emphasized";
+  const known = coerceRole(role);
+  const palette = known ? ROLE_META[known].palette : "gray";
+  return `${palette}.emphasized`;
 }
 
 export function UserMenu() {
@@ -37,7 +41,7 @@ export function UserMenu() {
 
   if (!session) return null;
   const initial = session.email.charAt(0).toUpperCase();
-  const isAdmin = session.role === "ADMIN";
+  const isAdmin = hasMinRole(session.role, "ADMIN");
 
   return (
     <Menu.Root>
@@ -64,11 +68,11 @@ export function UserMenu() {
         <Menu.Positioner>
           <Menu.Content minW="220px">
             <Box px={3} py={2}>
-              <Stack gap={0.5}>
+              <Stack gap={1.5} align="start">
                 <Text fontSize="sm" fontWeight="medium">
                   {session.email}
                 </Text>
-                <Text fontSize="xs" color="fg.muted">
+                <Text fontSize="xs" fontWeight="normal">
                   {session.role}
                 </Text>
               </Stack>

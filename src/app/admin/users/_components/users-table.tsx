@@ -14,12 +14,15 @@ import {
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
+import { RoleBadge } from "~/app/_components/role-badge";
 import { SearchInput } from "~/app/_components/search-input";
 import { StatusBadge } from "~/app/_components/status-badge";
 import { formatDateTime } from "~/lib/format";
+import { coerceRole, hasMinRole, type Role } from "~/lib/roles";
 import { coerceUserStatus, type UserStatus } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
+import { ChangeRoleDialog } from "./change-role-dialog";
 import { ChangeStatusDialog } from "./change-status-dialog";
 import { DeleteUserDialog } from "./delete-user-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
@@ -28,6 +31,7 @@ type SortField = "id" | "email" | "status" | "role" | "createdAt" | "updatedAt";
 type SortDir = "asc" | "desc";
 
 type EditingUser = { id: string; email: string; status: UserStatus };
+type EditingRoleUser = { id: string; email: string; role: Role };
 type DeletingUser = { id: string; email: string };
 type ResettingUser = { id: string; email: string };
 
@@ -43,11 +47,14 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 
 export function UsersTable() {
   const { data: users, isLoading } = api.admin.users.list.useQuery();
+  const { data: session } = api.auth.me.useQuery();
+  const canManage = !!session && hasMinRole(session.role, "SUPER_ADMIN");
 
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filter, setFilter] = useState("");
   const [editing, setEditing] = useState<EditingUser | null>(null);
+  const [editingRole, setEditingRole] = useState<EditingRoleUser | null>(null);
   const [deleting, setDeleting] = useState<DeletingUser | null>(null);
   const [resetting, setResetting] = useState<ResettingUser | null>(null);
 
@@ -132,13 +139,17 @@ export function UsersTable() {
                 {sortableHeader("role", "Role")}
                 {sortableHeader("createdAt", "Created")}
                 {sortableHeader("updatedAt", "Updated")}
-                <Table.ColumnHeader textAlign="end">Actions</Table.ColumnHeader>
+                {canManage && (
+                  <Table.ColumnHeader textAlign="end">
+                    Actions
+                  </Table.ColumnHeader>
+                )}
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {rows.length === 0 ? (
                 <Table.Row>
-                  <Table.Cell colSpan={7}>
+                  <Table.Cell colSpan={canManage ? 7 : 6}>
                     <Text textAlign="center" color="fg.muted" py={4}>
                       No users match the filter.
                     </Text>
@@ -164,63 +175,85 @@ export function UsersTable() {
                           <Badge>{user.status}</Badge>
                         )}
                       </Table.Cell>
-                      <Table.Cell>{user.role}</Table.Cell>
+                      <Table.Cell>
+                        <RoleBadge role={user.role} />
+                      </Table.Cell>
                       <Table.Cell>{formatDateTime(user.createdAt)}</Table.Cell>
                       <Table.Cell>{formatDateTime(user.updatedAt)}</Table.Cell>
-                      <Table.Cell textAlign="end">
-                        <Menu.Root>
-                          <Menu.Trigger asChild>
-                            <IconButton variant="ghost" aria-label="User actions">
-                              <Text as="span" fontSize="md" lineHeight="1">
-                                ⋮
-                              </Text>
-                            </IconButton>
-                          </Menu.Trigger>
-                          <Portal>
-                            <Menu.Positioner>
-                              <Menu.Content minW="180px">
-                                <Menu.Item
-                                  value="change-status"
-                                  onSelect={() =>
-                                    setEditing({
-                                      id: user.id,
-                                      email: user.email,
-                                      status: status ?? "PENDING_VERIFICATION",
-                                    })
-                                  }
-                                >
-                                  Change status
-                                </Menu.Item>
-                                <Menu.Item
-                                  value="reset-password"
-                                  onSelect={() =>
-                                    setResetting({
-                                      id: user.id,
-                                      email: user.email,
-                                    })
-                                  }
-                                >
-                                  Reset password
-                                </Menu.Item>
-                                <Menu.Separator />
-                                <Menu.Item
-                                  value="delete"
-                                  color="red.fg"
-                                  _hover={{ bg: "red.subtle" }}
-                                  onSelect={() =>
-                                    setDeleting({
-                                      id: user.id,
-                                      email: user.email,
-                                    })
-                                  }
-                                >
-                                  Delete user
-                                </Menu.Item>
-                              </Menu.Content>
-                            </Menu.Positioner>
-                          </Portal>
-                        </Menu.Root>
-                      </Table.Cell>
+                      {canManage && (
+                        <Table.Cell textAlign="end">
+                          <Menu.Root>
+                            <Menu.Trigger asChild>
+                              <IconButton
+                                variant="ghost"
+                                aria-label="User actions"
+                              >
+                                <Text as="span" fontSize="md" lineHeight="1">
+                                  ⋮
+                                </Text>
+                              </IconButton>
+                            </Menu.Trigger>
+                            <Portal>
+                              <Menu.Positioner>
+                                <Menu.Content minW="180px">
+                                  <Menu.Item
+                                    value="change-status"
+                                    onSelect={() =>
+                                      setEditing({
+                                        id: user.id,
+                                        email: user.email,
+                                        status:
+                                          status ?? "PENDING_VERIFICATION",
+                                      })
+                                    }
+                                  >
+                                    Change status
+                                  </Menu.Item>
+                                  <Menu.Item
+                                    value="change-role"
+                                    onSelect={() =>
+                                      setEditingRole({
+                                        id: user.id,
+                                        email: user.email,
+                                        role:
+                                          coerceRole(user.role) ??
+                                          "NON_TECHNICAL",
+                                      })
+                                    }
+                                  >
+                                    Change role
+                                  </Menu.Item>
+                                  <Menu.Item
+                                    value="reset-password"
+                                    onSelect={() =>
+                                      setResetting({
+                                        id: user.id,
+                                        email: user.email,
+                                      })
+                                    }
+                                  >
+                                    Reset password
+                                  </Menu.Item>
+                                  <Menu.Separator />
+                                  <Menu.Item
+                                    value="delete"
+                                    color="red.fg"
+                                    _hover={{ bg: "red.subtle" }}
+                                    onSelect={() =>
+                                      setDeleting({
+                                        id: user.id,
+                                        email: user.email,
+                                      })
+                                    }
+                                  >
+                                    Delete user
+                                  </Menu.Item>
+                                </Menu.Content>
+                              </Menu.Positioner>
+                            </Portal>
+                          </Menu.Root>
+                        </Table.Cell>
+                      )}
                     </Table.Row>
                   );
                 })
@@ -231,6 +264,10 @@ export function UsersTable() {
       )}
 
       <ChangeStatusDialog user={editing} onClose={() => setEditing(null)} />
+      <ChangeRoleDialog
+        user={editingRole}
+        onClose={() => setEditingRole(null)}
+      />
       <DeleteUserDialog user={deleting} onClose={() => setDeleting(null)} />
       <ResetPasswordDialog
         user={resetting}

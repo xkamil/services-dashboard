@@ -25,7 +25,7 @@ export async function ensureBootstrapAdmin(): Promise<void> {
       passwordHash,
       isTemporaryPassword: false,
       status: "ACTIVE",
-      role: "ADMIN",
+      role: "SUPER_ADMIN",
     },
   });
 

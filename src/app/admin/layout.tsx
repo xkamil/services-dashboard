@@ -5,7 +5,7 @@ import { Navbar, SECTIONS, type NavLink } from "~/app/_components/navbar";
 
 const adminLinks: NavLink[] = [
   { href: "/admin/users", label: "Users" },
-  { href: "/admin/changelog", label: "Changelog" },
+  { href: "/admin/changelog", label: "Changelog", minRole: "ADMIN" },
 ];
 
 export default function AdminLayout({

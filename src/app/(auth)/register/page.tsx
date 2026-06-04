@@ -6,6 +6,7 @@ import {
   Heading,
   Input,
   Link,
+  NativeSelect,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -15,6 +16,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { AuthCard, FormAlert } from "~/app/(auth)/_components/auth-card";
+import { ROLE_META, ROLES } from "~/lib/roles";
 import {
   type RegisterFormInput,
   registerFormSchema,
@@ -32,7 +34,12 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterFormInput>({
     resolver: zodResolver(registerFormSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      role: "NON_TECHNICAL",
+    },
   });
 
   const register = api.auth.register.useMutation({
@@ -54,9 +61,9 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = ({ email, password }: RegisterFormInput) => {
+  const onSubmit = ({ email, password, role }: RegisterFormInput) => {
     setErrorMsg("");
-    register.mutate({ email, password });
+    register.mutate({ email, password, role });
   };
 
   return (
@@ -104,6 +111,25 @@ export default function RegisterPage() {
                   <Field.ErrorText>
                     {errors.confirmPassword?.message}
                   </Field.ErrorText>
+                </Field.Root>
+
+                <Field.Root invalid={!!errors.role}>
+                  <Field.Label>Requested role</Field.Label>
+                  <NativeSelect.Root>
+                    <NativeSelect.Field {...formRegister("role")}>
+                      {ROLES.map((role) => (
+                        <option key={role} value={role}>
+                          {ROLE_META[role].label}
+                        </option>
+                      ))}
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                  </NativeSelect.Root>
+                  <Field.HelperText>
+                    An administrator will confirm your role when verifying your
+                    account.
+                  </Field.HelperText>
+                  <Field.ErrorText>{errors.role?.message}</Field.ErrorText>
                 </Field.Root>
               </Stack>
 
