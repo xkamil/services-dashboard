@@ -76,13 +76,7 @@ export function UserMenu() {
             <Menu.Separator />
             {isAdmin && (
               <Menu.Item value="admin" asChild>
-                <NextLink
-                  href="/admin"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Admin panel
-                </NextLink>
+                <NextLink href="/admin">Admin panel</NextLink>
               </Menu.Item>
             )}
             <Menu.Item value="change-password" asChild>

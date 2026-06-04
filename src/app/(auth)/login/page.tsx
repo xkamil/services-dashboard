@@ -65,7 +65,7 @@ export default function LoginPage() {
             <Field.Root invalid={!!errors.email}>
               <Field.Label>Email</Field.Label>
               <Input
-                type="email"
+                type="text"
                 placeholder="you@example.com"
                 {...register("email")}
               />

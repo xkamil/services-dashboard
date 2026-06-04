@@ -1,7 +1,10 @@
 import { z } from "zod";
 
+// Login accepts any non-empty identifier (not just valid emails) so the
+// bootstrap "admin" account can sign in. Registration still requires a real
+// email via registerServerSchema.
 export const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
+  email: z.string().min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
