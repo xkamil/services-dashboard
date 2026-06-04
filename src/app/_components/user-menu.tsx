@@ -18,6 +18,11 @@ import { useEffect, useState } from "react";
 
 import { api } from "~/trpc/react";
 
+/** Border color for the menu trigger, by user role. */
+function roleBorderColor(role: string) {
+  return role === "ADMIN" ? "yellow.emphasized" : "green.emphasized";
+}
+
 export function UserMenu() {
   const router = useRouter();
   const { data: session } = api.auth.me.useQuery();
@@ -42,6 +47,13 @@ export function UserMenu() {
           rounded="full"
           aria-label="Open user menu"
           p={0}
+          h="auto"
+          minH="0"
+          w="auto"
+          minW="0"
+          borderWidth="2px"
+          borderStyle="solid"
+          borderColor={roleBorderColor(session.role)}
         >
           <Avatar.Root size="sm">
             <Avatar.Fallback>{initial}</Avatar.Fallback>

@@ -17,6 +17,9 @@ export default function ChangePasswordPage() {
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState("");
 
+  const { data: session } = api.auth.me.useQuery();
+  const isTemporaryPassword = session?.isTemporaryPassword ?? false;
+
   const {
     register,
     handleSubmit,
@@ -49,7 +52,9 @@ export default function ChangePasswordPage() {
               Set new password
             </Heading>
             <Text fontSize="sm" textAlign="center" color="fg.muted">
-              Your password is temporary. Please set a new one to continue.
+              {isTemporaryPassword
+                ? "Your password is temporary. Please set a new one to continue."
+                : "Enter a new password for your account."}
             </Text>
           </Stack>
 
