@@ -9,7 +9,11 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const response = NextResponse.next();
-  const session = await getIronSession<SessionData>(request, response, sessionOptions);
+  const session = await getIronSession<SessionData>(
+    request,
+    response,
+    sessionOptions,
+  );
 
   const isAuthPath = AUTH_PATHS.some((p) => pathname.startsWith(p));
 
@@ -25,10 +29,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (
-    session.isTemporaryPassword &&
-    !pathname.startsWith("/change-password")
-  ) {
+  if (session.isTemporaryPassword && !pathname.startsWith("/change-password")) {
     return NextResponse.redirect(new URL("/change-password", request.url));
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Badge,
   Box,
   HStack,
   IconButton,
@@ -16,7 +17,7 @@ import { useMemo, useState } from "react";
 
 import { StatusBadge } from "~/app/_components/status-badge";
 import { formatDateTime } from "~/lib/format";
-import { type UserStatus, userStatusSchema } from "~/lib/validation/admin";
+import { coerceUserStatus, type UserStatus } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
 import { ChangeStatusDialog } from "./change-status-dialog";
@@ -31,7 +32,12 @@ type DeletingUser = { id: string; email: string };
 type ResettingUser = { id: string; email: string };
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active) return <Text as="span" opacity={0.3}>↕</Text>;
+  if (!active)
+    return (
+      <Text as="span" opacity={0.3}>
+        ↕
+      </Text>
+    );
   return <Text as="span">{dir === "asc" ? "↑" : "↓"}</Text>;
 }
 
@@ -111,7 +117,12 @@ export function UsersTable() {
           ))}
         </Stack>
       ) : (
-        <Box borderWidth="1px" borderColor="border" rounded="md" overflow="hidden">
+        <Box
+          borderWidth="1px"
+          borderColor="border"
+          rounded="md"
+          overflow="hidden"
+        >
           <Table.Root size="sm" variant="line">
             <Table.Header>
               <Table.Row>
@@ -135,15 +146,23 @@ export function UsersTable() {
                 </Table.Row>
               ) : (
                 rows.map((user) => {
-                  const status = userStatusSchema.parse(user.status);
+                  const status = coerceUserStatus(user.status);
                   return (
                     <Table.Row key={user.id}>
-                      <Table.Cell fontFamily="mono" fontSize="xs" color="fg.muted">
+                      <Table.Cell
+                        fontFamily="mono"
+                        fontSize="xs"
+                        color="fg.muted"
+                      >
                         {user.id}
                       </Table.Cell>
                       <Table.Cell>{user.email}</Table.Cell>
                       <Table.Cell>
-                        <StatusBadge status={status} />
+                        {status ? (
+                          <StatusBadge status={status} />
+                        ) : (
+                          <Badge>{user.status}</Badge>
+                        )}
                       </Table.Cell>
                       <Table.Cell>{user.role}</Table.Cell>
                       <Table.Cell>{formatDateTime(user.createdAt)}</Table.Cell>
@@ -170,7 +189,7 @@ export function UsersTable() {
                                     setEditing({
                                       id: user.id,
                                       email: user.email,
-                                      status,
+                                      status: status ?? "PENDING_VERIFICATION",
                                     })
                                   }
                                 >

@@ -18,6 +18,27 @@ function isActive(pathname: string, link: NavLink) {
   return pathname === link.href || pathname.startsWith(`${link.href}/`);
 }
 
+function NavTab({ link, active }: { link: NavLink; active: boolean }) {
+  return (
+    <Link
+      asChild
+      color={active ? "fg" : "fg.muted"}
+      fontWeight={active ? "semibold" : "normal"}
+      borderBottomWidth="2px"
+      borderColor={active ? "fg" : "transparent"}
+      h="full"
+      display="inline-flex"
+      alignItems="center"
+      rounded="none"
+      outline="none"
+      _hover={{ color: "fg", textDecoration: "none" }}
+      _focusVisible={{ outline: "none", color: "fg", borderColor: "fg" }}
+    >
+      <NextLink href={link.href}>{link.label}</NextLink>
+    </Link>
+  );
+}
+
 export function Navbar({
   sections,
   links = [],
@@ -44,32 +65,13 @@ export function Navbar({
                   |
                 </Text>
                 <HStack gap={6} h="full" fontSize="sm">
-                  {links.map((link) => {
-                    const active = isActive(pathname, link);
-                    return (
-                      <Link
-                        key={link.href}
-                        asChild
-                        color={active ? "fg" : "fg.muted"}
-                        fontWeight={active ? "semibold" : "normal"}
-                        borderBottomWidth="2px"
-                        borderColor={active ? "fg" : "transparent"}
-                        h="full"
-                        display="inline-flex"
-                        alignItems="center"
-                        rounded="none"
-                        outline="none"
-                        _hover={{ color: "fg", textDecoration: "none" }}
-                        _focusVisible={{
-                          outline: "none",
-                          color: "fg",
-                          borderColor: "fg",
-                        }}
-                      >
-                        <NextLink href={link.href}>{link.label}</NextLink>
-                      </Link>
-                    );
-                  })}
+                  {links.map((link) => (
+                    <NavTab
+                      key={link.href}
+                      link={link}
+                      active={isActive(pathname, link)}
+                    />
+                  ))}
                 </HStack>
               </>
             )}

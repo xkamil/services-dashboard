@@ -8,15 +8,14 @@ import { db } from "~/server/db";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await getSession();
-  const sessionData =
-    session.userId
-      ? {
-          userId: session.userId,
-          email: session.email,
-          role: session.role,
-          isTemporaryPassword: session.isTemporaryPassword,
-        }
-      : null;
+  const sessionData = session.userId
+    ? {
+        userId: session.userId,
+        email: session.email,
+        role: session.role,
+        isTemporaryPassword: session.isTemporaryPassword,
+      }
+    : null;
 
   return {
     db,

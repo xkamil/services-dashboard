@@ -1,19 +1,8 @@
 import { Badge } from "@chakra-ui/react";
 
-import type { UserStatus } from "~/lib/validation/admin";
-
-const PALETTE: Record<UserStatus, string> = {
-  ACTIVE: "green",
-  BLOCKED: "red",
-  PENDING_VERIFICATION: "yellow",
-};
-
-const LABEL: Record<UserStatus, string> = {
-  ACTIVE: "Active",
-  BLOCKED: "Blocked",
-  PENDING_VERIFICATION: "Pending verification",
-};
+import { USER_STATUS_META, type UserStatus } from "~/lib/validation/admin";
 
 export function StatusBadge({ status }: { status: UserStatus }) {
-  return <Badge colorPalette={PALETTE[status]}>{LABEL[status]}</Badge>;
+  const { label, palette } = USER_STATUS_META[status];
+  return <Badge colorPalette={palette}>{label}</Badge>;
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Box,
   Button,
   Field,
   Heading,
@@ -15,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { AuthCard, FormAlert } from "~/app/(auth)/_components/auth-card";
 import {
   type RegisterFormInput,
   registerFormSchema,
@@ -60,80 +60,72 @@ export default function RegisterPage() {
   };
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="bg">
-      <Box bg="bg.panel" borderWidth="1px" borderColor="border" p={8} rounded="lg" shadow="md" w="full" maxW="md">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack gap={6}>
-            <Heading size="xl" textAlign="center">Create account</Heading>
+    <AuthCard>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack gap={6}>
+          <Heading size="xl" textAlign="center">
+            Create account
+          </Heading>
 
-            {errorMsg && (
-              <Box bg="red.subtle" borderWidth="1px" borderColor="red.muted" rounded="md" p={3}>
-                <Text color="red.fg" fontSize="sm">{errorMsg}</Text>
-              </Box>
-            )}
+          {errorMsg && <FormAlert tone="error">{errorMsg}</FormAlert>}
 
-            {successMsg && (
-              <Box bg="green.subtle" borderWidth="1px" borderColor="green.muted" rounded="md" p={3}>
-                <Text color="green.fg" fontSize="sm">{successMsg}</Text>
-              </Box>
-            )}
+          {successMsg && <FormAlert tone="success">{successMsg}</FormAlert>}
 
-            {!successMsg && (
-              <>
-                <Stack gap={4}>
-                  <Field.Root invalid={!!errors.email}>
-                    <Field.Label>Email</Field.Label>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      {...formRegister("email")}
-                    />
-                    <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
-                  </Field.Root>
+          {!successMsg && (
+            <>
+              <Stack gap={4}>
+                <Field.Root invalid={!!errors.email}>
+                  <Field.Label>Email</Field.Label>
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    {...formRegister("email")}
+                  />
+                  <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+                </Field.Root>
 
-                  <Field.Root invalid={!!errors.password}>
-                    <Field.Label>Password</Field.Label>
-                    <Input
-                      type="password"
-                      placeholder="Min. 8 characters"
-                      {...formRegister("password")}
-                    />
-                    <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
-                  </Field.Root>
+                <Field.Root invalid={!!errors.password}>
+                  <Field.Label>Password</Field.Label>
+                  <Input
+                    type="password"
+                    placeholder="Min. 8 characters"
+                    {...formRegister("password")}
+                  />
+                  <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+                </Field.Root>
 
-                  <Field.Root invalid={!!errors.confirmPassword}>
-                    <Field.Label>Confirm password</Field.Label>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      {...formRegister("confirmPassword")}
-                    />
-                    <Field.ErrorText>
-                      {errors.confirmPassword?.message}
-                    </Field.ErrorText>
-                  </Field.Root>
-                </Stack>
+                <Field.Root invalid={!!errors.confirmPassword}>
+                  <Field.Label>Confirm password</Field.Label>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    {...formRegister("confirmPassword")}
+                  />
+                  <Field.ErrorText>
+                    {errors.confirmPassword?.message}
+                  </Field.ErrorText>
+                </Field.Root>
+              </Stack>
 
-                <Button
-                  type="submit"
-                  colorPalette="blue"
-                  width="full"
-                  loading={register.isPending}
-                >
-                  Register
-                </Button>
-              </>
-            )}
+              <Button
+                type="submit"
+                colorPalette="blue"
+                width="full"
+                loading={register.isPending}
+              >
+                Register
+              </Button>
+            </>
+          )}
 
-            <Text fontSize="sm" textAlign="center" color="fg.muted">
-              Already have an account?{" "}
-              <Link href="/login" color="blue.fg" fontWeight="medium">
-                Sign in
-              </Link>
-            </Text>
-          </Stack>
-        </form>
-      </Box>
-    </Box>
+          <Text fontSize="sm" textAlign="center" color="fg.muted">
+            Already have an account?{" "}
+            <Link href="/login" color="blue.fg" fontWeight="medium">
+              Sign in
+            </Link>
+          </Text>
+        </Stack>
+      </form>
+    </AuthCard>
   );
 }

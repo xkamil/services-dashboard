@@ -8,6 +8,22 @@ export const userStatusSchema = z.enum([
 
 export type UserStatus = z.infer<typeof userStatusSchema>;
 
+/** Single source of truth for how each user status is labelled and coloured. */
+export const USER_STATUS_META: Record<
+  UserStatus,
+  { label: string; palette: string }
+> = {
+  ACTIVE: { label: "Active", palette: "green" },
+  BLOCKED: { label: "Blocked", palette: "red" },
+  PENDING_VERIFICATION: { label: "Pending verification", palette: "yellow" },
+};
+
+/** Returns the status if it's a known value, otherwise null. */
+export function coerceUserStatus(value: string): UserStatus | null {
+  const parsed = userStatusSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+}
+
 export const updateUserStatusSchema = z.object({
   userId: z.string().min(1),
   status: userStatusSchema,

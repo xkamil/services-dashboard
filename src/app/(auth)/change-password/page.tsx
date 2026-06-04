@@ -1,19 +1,12 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Field,
-  Heading,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Field, Heading, Input, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { AuthCard, FormAlert } from "~/app/(auth)/_components/auth-card";
 import {
   type ChangePasswordFormInput,
   changePasswordFormSchema,
@@ -48,58 +41,54 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="bg">
-      <Box bg="bg.panel" borderWidth="1px" borderColor="border" p={8} rounded="lg" shadow="md" w="full" maxW="md">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack gap={6}>
-            <Stack gap={1}>
-              <Heading size="xl" textAlign="center">Set new password</Heading>
-              <Text fontSize="sm" textAlign="center" color="fg.muted">
-                Your password is temporary. Please set a new one to continue.
-              </Text>
-            </Stack>
-
-            {errorMsg && (
-              <Box bg="red.subtle" borderWidth="1px" borderColor="red.muted" rounded="md" p={3}>
-                <Text color="red.fg" fontSize="sm">{errorMsg}</Text>
-              </Box>
-            )}
-
-            <Stack gap={4}>
-              <Field.Root invalid={!!errors.newPassword}>
-                <Field.Label>New password</Field.Label>
-                <Input
-                  type="password"
-                  placeholder="Min. 8 characters"
-                  {...register("newPassword")}
-                />
-                <Field.ErrorText>{errors.newPassword?.message}</Field.ErrorText>
-              </Field.Root>
-
-              <Field.Root invalid={!!errors.confirmPassword}>
-                <Field.Label>Confirm new password</Field.Label>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  {...register("confirmPassword")}
-                />
-                <Field.ErrorText>
-                  {errors.confirmPassword?.message}
-                </Field.ErrorText>
-              </Field.Root>
-            </Stack>
-
-            <Button
-              type="submit"
-              colorPalette="blue"
-              width="full"
-              loading={changePassword.isPending}
-            >
-              Set password
-            </Button>
+    <AuthCard>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack gap={6}>
+          <Stack gap={1}>
+            <Heading size="xl" textAlign="center">
+              Set new password
+            </Heading>
+            <Text fontSize="sm" textAlign="center" color="fg.muted">
+              Your password is temporary. Please set a new one to continue.
+            </Text>
           </Stack>
-        </form>
-      </Box>
-    </Box>
+
+          {errorMsg && <FormAlert tone="error">{errorMsg}</FormAlert>}
+
+          <Stack gap={4}>
+            <Field.Root invalid={!!errors.newPassword}>
+              <Field.Label>New password</Field.Label>
+              <Input
+                type="password"
+                placeholder="Min. 8 characters"
+                {...register("newPassword")}
+              />
+              <Field.ErrorText>{errors.newPassword?.message}</Field.ErrorText>
+            </Field.Root>
+
+            <Field.Root invalid={!!errors.confirmPassword}>
+              <Field.Label>Confirm new password</Field.Label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                {...register("confirmPassword")}
+              />
+              <Field.ErrorText>
+                {errors.confirmPassword?.message}
+              </Field.ErrorText>
+            </Field.Root>
+          </Stack>
+
+          <Button
+            type="submit"
+            colorPalette="blue"
+            width="full"
+            loading={changePassword.isPending}
+          >
+            Set password
+          </Button>
+        </Stack>
+      </form>
+    </AuthCard>
   );
 }

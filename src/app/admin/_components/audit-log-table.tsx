@@ -16,18 +16,6 @@ import { formatDateTime } from "~/lib/format";
 import { MAX_AUDIT_RANGE_DAYS } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
-// Friendly labels for known mutation paths; unknown paths fall back to the raw
-// path so newly added mutations still show up without a code change.
-const ACTION_LABELS: Record<string, string> = {
-  "auth.login": "Signed in",
-  "auth.logout": "Signed out",
-  "auth.register": "Registered",
-  "auth.changePassword": "Changed password",
-  "admin.users.updateStatus": "Updated user status",
-  "admin.users.delete": "Deleted user",
-  "admin.users.resetPassword": "Reset user password",
-};
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function toDateInput(date: Date) {
@@ -76,14 +64,18 @@ function formatDetails(input: string | null): string {
 
 export function AuditLogTable() {
   const today = toDateInput(new Date());
-  const defaultFrom = toDateInput(new Date(Date.now() - MAX_AUDIT_RANGE_DAYS * DAY_MS));
+  const defaultFrom = toDateInput(
+    new Date(Date.now() - MAX_AUDIT_RANGE_DAYS * DAY_MS),
+  );
 
   const [from, setFrom] = useState(defaultFrom);
   const [to, setTo] = useState(today);
   const [filter, setFilter] = useState("");
 
   // Bounds that keep the selected window within MAX_AUDIT_RANGE_DAYS.
-  const fromMin = toDateInput(new Date(endOfDay(to).getTime() - MAX_AUDIT_RANGE_DAYS * DAY_MS));
+  const fromMin = toDateInput(
+    new Date(endOfDay(to).getTime() - MAX_AUDIT_RANGE_DAYS * DAY_MS),
+  );
 
   const { data: logs, isLoading } = api.admin.audit.list.useQuery({
     from: startOfDay(from),
@@ -97,7 +89,6 @@ export function AuditLogTable() {
 
     return logs.filter((log) => {
       const haystack = [
-        log.action,
         log.action,
         log.userEmail ?? "",
         formatDetails(log.input),
@@ -168,7 +159,12 @@ export function AuditLogTable() {
           ))}
         </Stack>
       ) : (
-        <Box borderWidth="1px" borderColor="border" rounded="md" overflow="hidden">
+        <Box
+          borderWidth="1px"
+          borderColor="border"
+          rounded="md"
+          overflow="hidden"
+        >
           <Table.Root size="sm" variant="line">
             <Table.Header>
               <Table.Row>
@@ -194,9 +190,7 @@ export function AuditLogTable() {
                       {formatDateTime(log.createdAt)}
                     </Table.Cell>
                     <Table.Cell>{log.userEmail ?? "—"}</Table.Cell>
-                    <Table.Cell>
-                      {log.action}
-                    </Table.Cell>
+                    <Table.Cell>{log.action}</Table.Cell>
                     <Table.Cell
                       color="fg.muted"
                       fontSize="xs"

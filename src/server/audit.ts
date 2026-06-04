@@ -44,8 +44,7 @@ export async function recordAuditLog(
         action: params.action,
         userId: params.actor?.userId ?? null,
         userEmail: params.actor?.email ?? null,
-        input:
-          sanitized === undefined ? null : JSON.stringify(sanitized),
+        input: sanitized === undefined ? null : JSON.stringify(sanitized),
       },
     });
   } catch (error) {

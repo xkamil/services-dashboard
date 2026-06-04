@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Box,
   Button,
   Field,
   Heading,
@@ -15,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { AuthCard, FormAlert } from "~/app/(auth)/_components/auth-card";
 import { type LoginInput, loginSchema } from "~/lib/validation/auth";
 import { api } from "~/trpc/react";
 
@@ -52,58 +52,54 @@ export default function LoginPage() {
   };
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="bg">
-      <Box bg="bg.panel" borderWidth="1px" borderColor="border" p={8} rounded="lg" shadow="md" w="full" maxW="md">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack gap={6}>
-            <Heading size="xl" textAlign="center">Sign in</Heading>
+    <AuthCard>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack gap={6}>
+          <Heading size="xl" textAlign="center">
+            Sign in
+          </Heading>
 
-            {errorMsg && (
-              <Box bg="red.subtle" borderWidth="1px" borderColor="red.muted" rounded="md" p={3}>
-                <Text color="red.fg" fontSize="sm">{errorMsg}</Text>
-              </Box>
-            )}
+          {errorMsg && <FormAlert tone="error">{errorMsg}</FormAlert>}
 
-            <Stack gap={4}>
-              <Field.Root invalid={!!errors.email}>
-                <Field.Label>Email</Field.Label>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  {...register("email")}
-                />
-                <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
-              </Field.Root>
+          <Stack gap={4}>
+            <Field.Root invalid={!!errors.email}>
+              <Field.Label>Email</Field.Label>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                {...register("email")}
+              />
+              <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+            </Field.Root>
 
-              <Field.Root invalid={!!errors.password}>
-                <Field.Label>Password</Field.Label>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  {...register("password")}
-                />
-                <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
-              </Field.Root>
-            </Stack>
-
-            <Button
-              type="submit"
-              colorPalette="blue"
-              width="full"
-              loading={login.isPending}
-            >
-              Sign in
-            </Button>
-
-            <Text fontSize="sm" textAlign="center" color="fg.muted">
-              Don&apos;t have an account?{" "}
-              <Link href="/register" color="blue.fg" fontWeight="medium">
-                Register
-              </Link>
-            </Text>
+            <Field.Root invalid={!!errors.password}>
+              <Field.Label>Password</Field.Label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                {...register("password")}
+              />
+              <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+            </Field.Root>
           </Stack>
-        </form>
-      </Box>
-    </Box>
+
+          <Button
+            type="submit"
+            colorPalette="blue"
+            width="full"
+            loading={login.isPending}
+          >
+            Sign in
+          </Button>
+
+          <Text fontSize="sm" textAlign="center" color="fg.muted">
+            Don&apos;t have an account?{" "}
+            <Link href="/register" color="blue.fg" fontWeight="medium">
+              Register
+            </Link>
+          </Text>
+        </Stack>
+      </form>
+    </AuthCard>
   );
 }

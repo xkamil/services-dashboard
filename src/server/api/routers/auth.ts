@@ -41,42 +41,41 @@ export const authRouter = createTRPCRouter({
       return { isFirstUser };
     }),
 
-  login: publicProcedure
-    .input(loginSchema)
-    .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({
-        where: { email: input.email },
+  login: publicProcedure.input(loginSchema).mutation(async ({ ctx, input }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { email: input.email },
+    });
+
+    const validPassword =
+      user !== null &&
+      (await bcrypt.compare(input.password, user.passwordHash));
+
+    if (!user || !validPassword) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "INVALID_CREDENTIALS",
       });
+    }
 
-      const validPassword =
-        user !== null && (await bcrypt.compare(input.password, user.passwordHash));
+    if (user.status === "BLOCKED") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "ACCOUNT_BLOCKED" });
+    }
 
-      if (!user || !validPassword) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "INVALID_CREDENTIALS",
-        });
-      }
+    if (user.status === "PENDING_VERIFICATION") {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: "ACCOUNT_PENDING_VERIFICATION",
+      });
+    }
 
-      if (user.status === "BLOCKED") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "ACCOUNT_BLOCKED" });
-      }
+    ctx.ironSession.userId = user.id;
+    ctx.ironSession.email = user.email;
+    ctx.ironSession.role = user.role;
+    ctx.ironSession.isTemporaryPassword = user.isTemporaryPassword;
+    await ctx.ironSession.save();
 
-      if (user.status === "PENDING_VERIFICATION") {
-        throw new TRPCError({
-          code: "PRECONDITION_FAILED",
-          message: "ACCOUNT_PENDING_VERIFICATION",
-        });
-      }
-
-      ctx.ironSession.userId = user.id;
-      ctx.ironSession.email = user.email;
-      ctx.ironSession.role = user.role;
-      ctx.ironSession.isTemporaryPassword = user.isTemporaryPassword;
-      await ctx.ironSession.save();
-
-      return { requiresPasswordChange: user.isTemporaryPassword };
-    }),
+    return { requiresPasswordChange: user.isTemporaryPassword };
+  }),
 
   logout: protectedProcedure.mutation(async ({ ctx }) => {
     ctx.ironSession.destroy();
