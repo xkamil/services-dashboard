@@ -7,7 +7,6 @@ import {
   deleteUserSchema,
   resetPasswordSchema,
   updateUserRoleSchema,
-  updateUserStatusSchema,
 } from "~/lib/validation/admin";
 import {
   adminProcedure,
@@ -21,7 +20,6 @@ const usersRouter = createTRPCRouter({
       select: {
         id: true,
         email: true,
-        status: true,
         role: true,
         createdAt: true,
         updatedAt: true,
@@ -29,16 +27,6 @@ const usersRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
     });
   }),
-
-  updateStatus: superAdminProcedure
-    .input(updateUserStatusSchema)
-    .mutation(({ ctx, input }) => {
-      return ctx.db.user.update({
-        where: { id: input.userId },
-        data: { status: input.status },
-        select: { id: true, status: true },
-      });
-    }),
 
   updateRole: superAdminProcedure
     .input(updateUserRoleSchema)

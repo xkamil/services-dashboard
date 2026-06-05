@@ -10,13 +10,12 @@ beforeEach(resetDb);
 afterAll(() => testDb.$disconnect());
 
 describe("auth.register", () => {
-  it("makes the first user a SUPER_ADMIN and activates them", async () => {
+  it("makes the first user a SUPER_ADMIN", async () => {
     const { caller } = createTestCaller();
 
     const result = await caller.auth.register({
       email: "first@test.local",
       password: "password123",
-      role: "NON_TECHNICAL",
     });
 
     expect(result).toEqual({ isFirstUser: true });
@@ -25,25 +24,22 @@ describe("auth.register", () => {
       where: { email: "first@test.local" },
     });
     expect(user.role).toBe("SUPER_ADMIN");
-    expect(user.status).toBe("ACTIVE");
   });
 
-  it("creates later users as PENDING with their requested role", async () => {
+  it("creates later users as a plain USER", async () => {
     await createUser({ email: "existing@test.local" });
     const { caller } = createTestCaller();
 
     const result = await caller.auth.register({
       email: "second@test.local",
       password: "password123",
-      role: "DEV",
     });
 
     expect(result).toEqual({ isFirstUser: false });
     const user = await testDb.user.findUniqueOrThrow({
       where: { email: "second@test.local" },
     });
-    expect(user.role).toBe("DEV");
-    expect(user.status).toBe("PENDING_VERIFICATION");
+    expect(user.role).toBe("USER");
   });
 
   it("rejects a duplicate email with CONFLICT", async () => {
@@ -54,18 +50,16 @@ describe("auth.register", () => {
       caller.auth.register({
         email: "taken@test.local",
         password: "password123",
-        role: "DEV",
       }),
     ).rejects.toMatchObject({ code: "CONFLICT", message: "EMAIL_TAKEN" });
   });
 });
 
 describe("auth.login", () => {
-  it("logs in an active user and persists the session", async () => {
+  it("logs in a user and persists the session", async () => {
     const user = await createUser({
       email: "login@test.local",
       password: "secret123",
-      status: "ACTIVE",
     });
     const { caller, ironSession } = createTestCaller();
 
@@ -114,35 +108,6 @@ describe("auth.login", () => {
     await expect(
       caller.auth.login({ email: "ghost@test.local", password: "secret123" }),
     ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
-  });
-
-  it("blocks BLOCKED accounts with FORBIDDEN", async () => {
-    await createUser({
-      email: "blocked@test.local",
-      password: "secret123",
-      status: "BLOCKED",
-    });
-    const { caller } = createTestCaller();
-
-    await expect(
-      caller.auth.login({ email: "blocked@test.local", password: "secret123" }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN", message: "ACCOUNT_BLOCKED" });
-  });
-
-  it("blocks PENDING accounts with PRECONDITION_FAILED", async () => {
-    await createUser({
-      email: "pending@test.local",
-      password: "secret123",
-      status: "PENDING_VERIFICATION",
-    });
-    const { caller } = createTestCaller();
-
-    await expect(
-      caller.auth.login({ email: "pending@test.local", password: "secret123" }),
-    ).rejects.toMatchObject({
-      code: "PRECONDITION_FAILED",
-      message: "ACCOUNT_PENDING_VERIFICATION",
-    });
   });
 });
 

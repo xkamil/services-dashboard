@@ -24,9 +24,9 @@ describe("admin.users.list", () => {
     expect(users[0]).not.toHaveProperty("passwordHash");
   });
 
-  it("rejects DEV callers with FORBIDDEN", async () => {
-    const dev = await createUser({ email: "dev@test.local", role: "DEV" });
-    const { caller } = createTestCaller(sessionFor(dev));
+  it("rejects plain USER callers with FORBIDDEN", async () => {
+    const user = await createUser({ email: "user@test.local", role: "USER" });
+    const { caller } = createTestCaller(sessionFor(user));
 
     await expect(caller.admin.users.list()).rejects.toMatchObject({
       code: "FORBIDDEN",
@@ -41,30 +41,7 @@ describe("admin.users.list", () => {
   });
 });
 
-describe("admin.users.updateStatus / updateRole (SUPER_ADMIN only)", () => {
-  it("lets a SUPER_ADMIN change a user's status", async () => {
-    const superAdmin = await createUser({
-      email: "super@test.local",
-      role: "SUPER_ADMIN",
-    });
-    const target = await createUser({
-      email: "target@test.local",
-      status: "PENDING_VERIFICATION",
-    });
-    const { caller } = createTestCaller(sessionFor(superAdmin));
-
-    const result = await caller.admin.users.updateStatus({
-      userId: target.id,
-      status: "ACTIVE",
-    });
-
-    expect(result).toEqual({ id: target.id, status: "ACTIVE" });
-    const updated = await testDb.user.findUniqueOrThrow({
-      where: { id: target.id },
-    });
-    expect(updated.status).toBe("ACTIVE");
-  });
-
+describe("admin.users.updateRole (SUPER_ADMIN only)", () => {
   it("lets a SUPER_ADMIN change a user's role", async () => {
     const superAdmin = await createUser({
       email: "super@test.local",

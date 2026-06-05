@@ -33,11 +33,10 @@ export const authRouter = createTRPCRouter({
           email: input.email,
           passwordHash,
           isTemporaryPassword: false,
-          status: isFirstUser ? "ACTIVE" : "PENDING_VERIFICATION",
-          // Self-registrants get the role they requested, but it has no effect
-          // until a SUPER_ADMIN activates the account. The first user (defensive
-          // fallback; bootstrap normally beats this) becomes SUPER_ADMIN.
-          role: isFirstUser ? "SUPER_ADMIN" : input.role,
+          // Self-registrants are plain USERs, active immediately. The first user
+          // (defensive fallback; bootstrap normally beats this) becomes
+          // SUPER_ADMIN.
+          role: isFirstUser ? "SUPER_ADMIN" : "USER",
         },
       });
 
@@ -57,17 +56,6 @@ export const authRouter = createTRPCRouter({
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "INVALID_CREDENTIALS",
-      });
-    }
-
-    if (user.status === "BLOCKED") {
-      throw new TRPCError({ code: "FORBIDDEN", message: "ACCOUNT_BLOCKED" });
-    }
-
-    if (user.status === "PENDING_VERIFICATION") {
-      throw new TRPCError({
-        code: "PRECONDITION_FAILED",
-        message: "ACCOUNT_PENDING_VERIFICATION",
       });
     }
 

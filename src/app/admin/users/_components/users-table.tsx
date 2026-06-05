@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Badge,
   Box,
   HStack,
   IconButton,
@@ -22,21 +21,17 @@ import { useMemo, useState } from "react";
 
 import { RoleBadge } from "~/app/_components/role-badge";
 import { SearchInput } from "~/app/_components/search-input";
-import { StatusBadge } from "~/app/_components/status-badge";
 import { formatDateTime } from "~/lib/format";
 import { coerceRole, hasMinRole, type Role } from "~/lib/roles";
-import { coerceUserStatus, type UserStatus } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
 import { ChangeRoleDialog } from "./change-role-dialog";
-import { ChangeStatusDialog } from "./change-status-dialog";
 import { DeleteUserDialog } from "./delete-user-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
 
-type SortField = "id" | "email" | "status" | "role" | "createdAt" | "updatedAt";
+type SortField = "id" | "email" | "role" | "createdAt" | "updatedAt";
 type SortDir = "asc" | "desc";
 
-type EditingUser = { id: string; email: string; status: UserStatus };
 type EditingRoleUser = { id: string; email: string; role: Role };
 type DeletingUser = { id: string; email: string };
 type ResettingUser = { id: string; email: string };
@@ -67,7 +62,6 @@ export function UsersTable() {
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filter, setFilter] = useState("");
-  const [editing, setEditing] = useState<EditingUser | null>(null);
   const [editingRole, setEditingRole] = useState<EditingRoleUser | null>(null);
   const [deleting, setDeleting] = useState<DeletingUser | null>(null);
   const [resetting, setResetting] = useState<ResettingUser | null>(null);
@@ -78,7 +72,7 @@ export function UsersTable() {
     const filterLower = filter.trim().toLowerCase();
     const filtered = filterLower
       ? users.filter((u) =>
-          [u.id, u.email, u.status, u.role].some((v) =>
+          [u.id, u.email, u.role].some((v) =>
             v.toLowerCase().includes(filterLower),
           ),
         )
@@ -125,7 +119,7 @@ export function UsersTable() {
   return (
     <Stack gap={4}>
       <SearchInput
-        placeholder="Filter by ID, email, status, or role…"
+        placeholder="Filter by ID, email, or role…"
         value={filter}
         onChange={setFilter}
         maxW="sm"
@@ -149,7 +143,6 @@ export function UsersTable() {
               <Table.Row>
                 {sortableHeader("id", "User ID")}
                 {sortableHeader("email", "Email")}
-                {sortableHeader("status", "Status")}
                 {sortableHeader("role", "Role")}
                 {sortableHeader("createdAt", "Created")}
                 {sortableHeader("updatedAt", "Updated")}
@@ -163,7 +156,7 @@ export function UsersTable() {
             <Table.Body>
               {rows.length === 0 ? (
                 <Table.Row>
-                  <Table.Cell colSpan={canManage ? 7 : 6}>
+                  <Table.Cell colSpan={canManage ? 6 : 5}>
                     <Text textAlign="center" color="fg.muted" py={4}>
                       No users match the filter.
                     </Text>
@@ -171,7 +164,6 @@ export function UsersTable() {
                 </Table.Row>
               ) : (
                 rows.map((user) => {
-                  const status = coerceUserStatus(user.status);
                   return (
                     <Table.Row key={user.id}>
                       <Table.Cell
@@ -182,13 +174,6 @@ export function UsersTable() {
                         {user.id}
                       </Table.Cell>
                       <Table.Cell>{user.email}</Table.Cell>
-                      <Table.Cell>
-                        {status ? (
-                          <StatusBadge status={status} />
-                        ) : (
-                          <Badge>{user.status}</Badge>
-                        )}
-                      </Table.Cell>
                       <Table.Cell>
                         <RoleBadge role={user.role} />
                       </Table.Cell>
@@ -209,27 +194,13 @@ export function UsersTable() {
                               <Menu.Positioner>
                                 <Menu.Content minW="180px">
                                   <Menu.Item
-                                    value="change-status"
-                                    onSelect={() =>
-                                      setEditing({
-                                        id: user.id,
-                                        email: user.email,
-                                        status:
-                                          status ?? "PENDING_VERIFICATION",
-                                      })
-                                    }
-                                  >
-                                    Change status
-                                  </Menu.Item>
-                                  <Menu.Item
                                     value="change-role"
                                     onSelect={() =>
                                       setEditingRole({
                                         id: user.id,
                                         email: user.email,
                                         role:
-                                          coerceRole(user.role) ??
-                                          "NON_TECHNICAL",
+                                          coerceRole(user.role) ?? "USER",
                                       })
                                     }
                                   >
@@ -275,7 +246,6 @@ export function UsersTable() {
         </Box>
       )}
 
-      <ChangeStatusDialog user={editing} onClose={() => setEditing(null)} />
       <ChangeRoleDialog
         user={editingRole}
         onClose={() => setEditingRole(null)}

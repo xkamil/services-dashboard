@@ -5,21 +5,19 @@
  * edge middleware as well as server and client code.
  */
 
-export const ROLES = ["NON_TECHNICAL", "DEV", "ADMIN", "SUPER_ADMIN"] as const;
+export const ROLES = ["USER", "ADMIN", "SUPER_ADMIN"] as const;
 export type Role = (typeof ROLES)[number];
 
 /** Higher rank = more privileges. Drives all hierarchical permission checks. */
 export const ROLE_RANK: Record<Role, number> = {
-  NON_TECHNICAL: 0,
-  DEV: 1,
-  ADMIN: 2,
-  SUPER_ADMIN: 3,
+  USER: 0,
+  ADMIN: 1,
+  SUPER_ADMIN: 2,
 };
 
 /** Single source of truth for how each role is labelled and coloured. */
 export const ROLE_META: Record<Role, { label: string; palette: string }> = {
-  NON_TECHNICAL: { label: "Non-technical", palette: "green" },
-  DEV: { label: "Developer", palette: "purple" },
+  USER: { label: "User", palette: "green" },
   ADMIN: { label: "Admin", palette: "orange" },
   SUPER_ADMIN: { label: "Super admin", palette: "red" },
 };

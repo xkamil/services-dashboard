@@ -36,13 +36,7 @@ export default function LoginPage() {
       router.push(requiresPasswordChange ? "/change-password" : "/");
     },
     onError: (error) => {
-      if (error.message === "ACCOUNT_BLOCKED") {
-        setErrorMsg("Your account has been blocked. Contact an administrator.");
-      } else if (error.message === "ACCOUNT_PENDING_VERIFICATION") {
-        setErrorMsg(
-          "Your account is awaiting administrator approval. You'll be able to sign in once it's been verified.",
-        );
-      } else if (error.message === "INVALID_CREDENTIALS") {
+      if (error.message === "INVALID_CREDENTIALS") {
         setErrorMsg("Invalid email or password.");
       } else {
         setErrorMsg(

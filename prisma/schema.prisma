@@ -13,8 +13,7 @@ model User {
     email               String   @unique
     passwordHash        String
     isTemporaryPassword Boolean  @default(false)
-    status              String   @default("PENDING_VERIFICATION") // ACTIVE | BLOCKED | PENDING_VERIFICATION
-    role                String   @default("NON_TECHNICAL")        // NON_TECHNICAL | DEV | ADMIN | SUPER_ADMIN
+    role                String   @default("USER") // USER | ADMIN | SUPER_ADMIN
     createdAt           DateTime @default(now())
     updatedAt           DateTime @updatedAt
 
@@ -37,7 +36,7 @@ model UserSecret {
 
 model AuditLog {
     id        String   @id @default(cuid())
-    action    String // tRPC mutation path, e.g. "admin.users.updateStatus"
+    action    String // tRPC mutation path, e.g. "admin.users.updateRole"
     userId    String? // actor id, null when unauthenticated
     userEmail String? // actor email snapshot at the time of the action
     input     String? // sanitized JSON of the mutation input

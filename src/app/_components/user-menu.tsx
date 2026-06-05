@@ -4,13 +4,13 @@ import {
   Avatar,
   Badge,
   Box,
-  HStack,
   IconButton,
   Menu,
   Portal,
   Stack,
   Switch,
   Text,
+  HStack,
 } from "@chakra-ui/react";
 import { Moon, Sun } from "lucide-react";
 import NextLink from "next/link";
@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { ROLE_META, coerceRole } from "~/lib/roles";
 import { api } from "~/trpc/react";
 
-import { SecretsDialog } from "./secrets-dialog";
+import { useSecrets } from "./secrets-context";
 
 /** Border color for the menu trigger, by user role. */
 function roleBorderColor(role: string) {
@@ -42,7 +42,7 @@ export function UserMenu() {
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
 
-  const [secretsOpen, setSecretsOpen] = useState(false);
+  const { openSecrets } = useSecrets();
 
   if (!session) return null;
   const initial = session.email.charAt(0).toUpperCase();
@@ -88,7 +88,7 @@ export function UserMenu() {
               <Menu.Item value="change-password" asChild>
                 <NextLink href="/change-password">Change password</NextLink>
               </Menu.Item>
-              <Menu.Item value="secrets" onSelect={() => setSecretsOpen(true)}>
+              <Menu.Item value="secrets" onSelect={openSecrets}>
                 Secrets
               </Menu.Item>
               <Menu.Separator />
@@ -131,10 +131,6 @@ export function UserMenu() {
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
-      <SecretsDialog
-        open={secretsOpen}
-        onClose={() => setSecretsOpen(false)}
-      />
     </>
   );
 }

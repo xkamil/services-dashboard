@@ -1088,7 +1088,6 @@ export namespace Prisma {
     email: string | null
     passwordHash: string | null
     isTemporaryPassword: boolean | null
-    status: string | null
     role: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -1099,7 +1098,6 @@ export namespace Prisma {
     email: string | null
     passwordHash: string | null
     isTemporaryPassword: boolean | null
-    status: string | null
     role: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -1110,7 +1108,6 @@ export namespace Prisma {
     email: number
     passwordHash: number
     isTemporaryPassword: number
-    status: number
     role: number
     createdAt: number
     updatedAt: number
@@ -1123,7 +1120,6 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     isTemporaryPassword?: true
-    status?: true
     role?: true
     createdAt?: true
     updatedAt?: true
@@ -1134,7 +1130,6 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     isTemporaryPassword?: true
-    status?: true
     role?: true
     createdAt?: true
     updatedAt?: true
@@ -1145,7 +1140,6 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     isTemporaryPassword?: true
-    status?: true
     role?: true
     createdAt?: true
     updatedAt?: true
@@ -1229,7 +1223,6 @@ export namespace Prisma {
     email: string
     passwordHash: string
     isTemporaryPassword: boolean
-    status: string
     role: string
     createdAt: Date
     updatedAt: Date
@@ -1257,7 +1250,6 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     isTemporaryPassword?: boolean
-    status?: boolean
     role?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1270,7 +1262,6 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     isTemporaryPassword?: boolean
-    status?: boolean
     role?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1281,7 +1272,6 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     isTemporaryPassword?: boolean
-    status?: boolean
     role?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1292,13 +1282,12 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     isTemporaryPassword?: boolean
-    status?: boolean
     role?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "isTemporaryPassword" | "status" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "isTemporaryPassword" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     secrets?: boolean | User$secretsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1316,7 +1305,6 @@ export namespace Prisma {
       email: string
       passwordHash: string
       isTemporaryPassword: boolean
-      status: string
       role: string
       createdAt: Date
       updatedAt: Date
@@ -1748,7 +1736,6 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly isTemporaryPassword: FieldRef<"User", 'Boolean'>
-    readonly status: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
@@ -4271,7 +4258,6 @@ export namespace Prisma {
     email: 'email',
     passwordHash: 'passwordHash',
     isTemporaryPassword: 'isTemporaryPassword',
-    status: 'status',
     role: 'role',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -4364,7 +4350,6 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
     isTemporaryPassword?: BoolFilter<"User"> | boolean
-    status?: StringFilter<"User"> | string
     role?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -4376,7 +4361,6 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     isTemporaryPassword?: SortOrder
-    status?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -4391,7 +4375,6 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     passwordHash?: StringFilter<"User"> | string
     isTemporaryPassword?: BoolFilter<"User"> | boolean
-    status?: StringFilter<"User"> | string
     role?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -4403,7 +4386,6 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     isTemporaryPassword?: SortOrder
-    status?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -4420,7 +4402,6 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     isTemporaryPassword?: BoolWithAggregatesFilter<"User"> | boolean
-    status?: StringWithAggregatesFilter<"User"> | string
     role?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -4549,7 +4530,6 @@ export namespace Prisma {
     email: string
     passwordHash: string
     isTemporaryPassword?: boolean
-    status?: string
     role?: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -4561,7 +4541,6 @@ export namespace Prisma {
     email: string
     passwordHash: string
     isTemporaryPassword?: boolean
-    status?: string
     role?: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -4573,7 +4552,6 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isTemporaryPassword?: BoolFieldUpdateOperationsInput | boolean
-    status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -4585,7 +4563,6 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isTemporaryPassword?: BoolFieldUpdateOperationsInput | boolean
-    status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -4597,7 +4574,6 @@ export namespace Prisma {
     email: string
     passwordHash: string
     isTemporaryPassword?: boolean
-    status?: string
     role?: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -4608,7 +4584,6 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isTemporaryPassword?: BoolFieldUpdateOperationsInput | boolean
-    status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -4619,7 +4594,6 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isTemporaryPassword?: BoolFieldUpdateOperationsInput | boolean
-    status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -4795,7 +4769,6 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     isTemporaryPassword?: SortOrder
-    status?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -4806,7 +4779,6 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     isTemporaryPassword?: SortOrder
-    status?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -4817,7 +4789,6 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     isTemporaryPassword?: SortOrder
-    status?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -5214,7 +5185,6 @@ export namespace Prisma {
     email: string
     passwordHash: string
     isTemporaryPassword?: boolean
-    status?: string
     role?: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -5225,7 +5195,6 @@ export namespace Prisma {
     email: string
     passwordHash: string
     isTemporaryPassword?: boolean
-    status?: string
     role?: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -5252,7 +5221,6 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isTemporaryPassword?: BoolFieldUpdateOperationsInput | boolean
-    status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -5263,7 +5231,6 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isTemporaryPassword?: BoolFieldUpdateOperationsInput | boolean
-    status?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

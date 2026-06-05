@@ -6,29 +6,21 @@ import {
   Heading,
   Input,
   Link,
-  NativeSelect,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { AuthCard, FormAlert } from "~/app/(auth)/_components/auth-card";
-import { ROLE_META, ROLES } from "~/lib/roles";
 import {
   type RegisterFormInput,
   registerFormSchema,
 } from "~/lib/validation/auth";
 import { api } from "~/trpc/react";
 
-// Roles a user may request when self-registering. SUPER_ADMIN is intentionally
-// excluded — that role is only ever assigned by an existing super admin.
-const REQUESTABLE_ROLES = ROLES.filter((role) => role !== "SUPER_ADMIN");
-
 export default function RegisterPage() {
-  const router = useRouter();
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
@@ -42,19 +34,12 @@ export default function RegisterPage() {
       email: "",
       password: "",
       confirmPassword: "",
-      role: "NON_TECHNICAL",
     },
   });
 
   const register = api.auth.register.useMutation({
-    onSuccess: ({ isFirstUser }) => {
-      if (isFirstUser) {
-        router.push("/login");
-      } else {
-        setSuccessMsg(
-          "Account created. Please wait for an administrator to verify your account.",
-        );
-      }
+    onSuccess: () => {
+      setSuccessMsg("Account created. You can now sign in.");
     },
     onError: (error) => {
       if (error.message === "EMAIL_TAKEN") {
@@ -73,9 +58,9 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = ({ email, password, role }: RegisterFormInput) => {
+  const onSubmit = ({ email, password }: RegisterFormInput) => {
     setErrorMsg("");
-    register.mutate({ email, password, role });
+    register.mutate({ email, password });
   };
 
   return (
@@ -123,25 +108,6 @@ export default function RegisterPage() {
                   <Field.ErrorText>
                     {errors.confirmPassword?.message}
                   </Field.ErrorText>
-                </Field.Root>
-
-                <Field.Root invalid={!!errors.role}>
-                  <Field.Label>Requested role</Field.Label>
-                  <NativeSelect.Root>
-                    <NativeSelect.Field {...formRegister("role")}>
-                      {REQUESTABLE_ROLES.map((role) => (
-                        <option key={role} value={role}>
-                          {ROLE_META[role].label}
-                        </option>
-                      ))}
-                    </NativeSelect.Field>
-                    <NativeSelect.Indicator />
-                  </NativeSelect.Root>
-                  <Field.HelperText>
-                    An administrator will confirm your role when verifying your
-                    account.
-                  </Field.HelperText>
-                  <Field.ErrorText>{errors.role?.message}</Field.ErrorText>
                 </Field.Root>
               </Stack>
 

@@ -23,7 +23,7 @@ const ROLE_OPTIONS = roleSchema.options.map((value) => ({
 }));
 
 export function ChangeRoleDialog({ user, onClose }: Props) {
-  const [role, setRole] = useState<Role>("NON_TECHNICAL");
+  const [role, setRole] = useState<Role>("USER");
   const displayUser = useLastValue(user);
 
   useEffect(() => {
