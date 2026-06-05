@@ -7,6 +7,7 @@ import {
   SubNav,
   type NavLink,
 } from "~/app/_components/navbar";
+import { SecretsProvider } from "~/app/_components/secrets-context";
 
 const adminLinks: NavLink[] = [
   { href: "/admin/users", label: "Users" },
@@ -17,12 +18,14 @@ export default function AdminLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <Box minH="100vh" bg="bg">
-      <Navbar sections={SECTIONS} />
-      <SubNav links={adminLinks} />
-      <Container maxW="6xl" py={8}>
-        {children}
-      </Container>
-    </Box>
+    <SecretsProvider>
+      <Box minH="100vh" bg="bg">
+        <Navbar sections={SECTIONS} />
+        <SubNav links={adminLinks} />
+        <Container maxW="6xl" py={8}>
+          {children}
+        </Container>
+      </Box>
+    </SecretsProvider>
   );
 }

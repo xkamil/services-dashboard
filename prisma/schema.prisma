@@ -17,6 +17,22 @@ model User {
     role                String   @default("NON_TECHNICAL")        // NON_TECHNICAL | DEV | ADMIN | SUPER_ADMIN
     createdAt           DateTime @default(now())
     updatedAt           DateTime @updatedAt
+
+    secrets UserSecret[]
+}
+
+model UserSecret {
+    id         String   @id @default(cuid())
+    userId     String
+    key        String // registry key, e.g. "GITHUB_API_TOKEN" (see src/lib/secrets.ts)
+    ciphertext String // AES-256-GCM payload: base64(iv).base64(authTag).base64(data)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, key])
+    @@index([userId])
 }
 
 model AuditLog {

@@ -16,6 +16,9 @@ export default defineConfig({
       DATABASE_URL: TEST_DATABASE_URL,
       // iron-session requires a >=32 char secret; value is irrelevant in tests.
       SESSION_SECRET: "test-session-secret-at-least-32-characters",
+      // Base64 of 32 random bytes; throwaway value, only used to exercise the
+      // secrets encryption round-trip in tests.
+      SECRETS_ENCRYPTION_KEY: "aNmUwLTmLKBpqeOfiG5GPMhUZsd/kJm75ttDoAbySmo=",
     },
   },
 });

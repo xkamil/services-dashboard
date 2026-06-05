@@ -5,7 +5,7 @@ import { Button, Text } from "@chakra-ui/react";
 import { showErrorToast, showSuccessToast } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
-import { AppDialog, useLastValue } from "./dialog-utils";
+import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
 
 type DeletingUser = { id: string; email: string };
 

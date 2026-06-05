@@ -11,7 +11,7 @@ import {
 } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
-import { AppDialog, useLastValue } from "./dialog-utils";
+import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
 
 type EditingUser = { id: string; email: string; status: UserStatus };
 
