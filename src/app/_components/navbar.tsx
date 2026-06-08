@@ -25,7 +25,7 @@ export type NavLink = {
 };
 
 export const SECTIONS: NavLink[] = [
-  { href: "/", label: "Dashboard" },
+  { href: "/environments", label: "Environments" },
   // Link straight to the first admin page rather than `/admin` (which only
   // redirects) so client-side navigation mounts the admin layout immediately.
   {
@@ -42,22 +42,28 @@ function isActive(pathname: string, link: NavLink) {
   return pathname === base || pathname.startsWith(`${base}/`);
 }
 
+/**
+ * Visual styling shared by every underline tab — the main section tabs and the
+ * sub-nav tabs. Keeps them identical.
+ */
+const navTabStyles = (active: boolean) =>
+  ({
+    color: active ? "fg" : "fg.muted",
+    fontWeight: active ? "semibold" : "normal",
+    borderBottomWidth: "2px",
+    borderColor: active ? "fg" : "transparent",
+    h: "full",
+    display: "inline-flex",
+    alignItems: "center",
+    rounded: "none",
+    outline: "none",
+    _hover: { color: "fg", textDecoration: "none" },
+    _focusVisible: { outline: "none", color: "fg", borderColor: "fg" },
+  }) as const;
+
 function NavTab({ link, active }: { link: NavLink; active: boolean }) {
   return (
-    <Link
-      asChild
-      color={active ? "fg" : "fg.muted"}
-      fontWeight={active ? "semibold" : "normal"}
-      borderBottomWidth="2px"
-      borderColor={active ? "fg" : "transparent"}
-      h="full"
-      display="inline-flex"
-      alignItems="center"
-      rounded="none"
-      outline="none"
-      _hover={{ color: "fg", textDecoration: "none" }}
-      _focusVisible={{ outline: "none", color: "fg", borderColor: "fg" }}
-    >
+    <Link asChild {...navTabStyles(active)}>
       <NextLink href={link.href}>{link.label}</NextLink>
     </Link>
   );

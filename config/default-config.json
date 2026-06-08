@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "defaults": {
+    "environment": {
+      "variables": {},
+      "links": {}
+    },
+    "service": {
+      "links": {}
+    }
+  },
+  "environments": [
+    {
+      "name": "Development",
+      "variables": {
+        "baseDomain": "dev.example.com"
+      },
+      "links": {
+        "grafana": "https://grafana.${baseDomain}"
+      },
+      "services": []
+    },
+    {
+      "name": "Staging",
+      "variables": {
+        "baseDomain": "stage.example.com"
+      },
+      "links": {
+        "grafana": "https://grafana.${baseDomain}"
+      },
+      "services": []
+    },
+    {
+      "name": "Production",
+      "variables": {
+        "baseDomain": "example.com"
+      },
+      "links": {
+        "grafana": "https://grafana.${baseDomain}",
+        "status_page": "https://status.${baseDomain}"
+      },
+      "services": [
+        {
+          "name": "Payroll Service",
+          "links": {
+            "runbook": "https://wiki.${baseDomain}/payroll-runbook"
+          }
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "name": "Auth Service",
+      "links": {
+        "repository": "https://bitbucket.org/symmetrical/auth-service",
+        "logs": "https://grafana.${baseDomain}/logs/auth-service",
+        "swagger": "https://auth.${baseDomain}/swagger-ui.html",
+        "kafka": "https://kafka-ui.${baseDomain}/auth-service"
+      }
+    },
+    {
+      "name": "Payroll Service",
+      "links": {
+        "repository": "https://bitbucket.org/symmetrical/payroll-service",
+        "logs": "https://grafana.${baseDomain}/logs/payroll-service",
+        "swagger": null,
+        "kafka": "https://kafka-ui.${baseDomain}/payroll-service"
+      }
+    }
+  ]
+}
