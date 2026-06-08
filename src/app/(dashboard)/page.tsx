@@ -1,11 +1,7 @@
-import { Text } from "@chakra-ui/react";
+import { redirect } from "next/navigation";
 
-import { SecretGuard } from "~/app/_components/secret-guard";
-
+// Environments is the default landing page for now. More dashboard pages will
+// live alongside it under (dashboard), so `/` just forwards to it.
 export default function DashboardPage() {
-  return (
-    <SecretGuard secret="JENKINS_API_TOKEN">
-      <Text color="fg.muted">Welcome to your dashboard.</Text>
-    </SecretGuard>
-  );
+  redirect("/environments");
 }

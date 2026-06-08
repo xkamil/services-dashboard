@@ -13,6 +13,7 @@ import {
   createTRPCRouter,
   superAdminProcedure,
 } from "~/server/api/trpc";
+import { configRouter } from "~/server/api/routers/config";
 
 const usersRouter = createTRPCRouter({
   list: adminProcedure.query(({ ctx }) => {
@@ -80,4 +81,5 @@ const auditRouter = createTRPCRouter({
 export const adminRouter = createTRPCRouter({
   users: usersRouter,
   audit: auditRouter,
+  config: configRouter,
 });

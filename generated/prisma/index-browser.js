@@ -146,6 +146,16 @@ exports.Prisma.AuditLogScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.ConfigVersionScalarFieldEnum = {
+  id: 'id',
+  version: 'version',
+  data: 'data',
+  message: 'message',
+  authorId: 'authorId',
+  authorEmail: 'authorEmail',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -160,7 +170,8 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   User: 'User',
   UserSecret: 'UserSecret',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  ConfigVersion: 'ConfigVersion'
 };
 
 /**

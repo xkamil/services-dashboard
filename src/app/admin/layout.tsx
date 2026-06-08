@@ -11,6 +11,7 @@ import { SecretsProvider } from "~/app/_components/secrets-context";
 
 const adminLinks: NavLink[] = [
   { href: "/admin/users", label: "Users" },
+  { href: "/admin/config", label: "Configuration", minRole: "ADMIN" },
   { href: "/admin/changelog", label: "Changelog", minRole: "ADMIN" },
 ];
 

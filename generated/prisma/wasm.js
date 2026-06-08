@@ -118,6 +118,16 @@ exports.Prisma.AuditLogScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.ConfigVersionScalarFieldEnum = {
+  id: 'id',
+  version: 'version',
+  data: 'data',
+  message: 'message',
+  authorId: 'authorId',
+  authorEmail: 'authorEmail',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -132,7 +142,8 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   User: 'User',
   UserSecret: 'UserSecret',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  ConfigVersion: 'ConfigVersion'
 };
 /**
  * Create the Client
@@ -145,7 +156,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "E:\\dokumenty\\projects\\js\\services-dasboard\\generated\\prisma",
+      "value": "C:\\projects\\qa\\services-dashboard\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -159,7 +170,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "E:\\dokumenty\\projects\\js\\services-dasboard\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\projects\\qa\\services-dashboard\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -173,7 +184,6 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -182,13 +192,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id                  String   @id @default(cuid())\n  email               String   @unique\n  passwordHash        String\n  isTemporaryPassword Boolean  @default(false)\n  role                String   @default(\"USER\") // USER | ADMIN | SUPER_ADMIN\n  createdAt           DateTime @default(now())\n  updatedAt           DateTime @updatedAt\n\n  secrets UserSecret[]\n}\n\nmodel UserSecret {\n  id         String   @id @default(cuid())\n  userId     String\n  key        String // registry key, e.g. \"GITHUB_API_TOKEN\" (see src/lib/secrets.ts)\n  ciphertext String // AES-256-GCM payload: base64(iv).base64(authTag).base64(data)\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n\n  user User @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@unique([userId, key])\n  @@index([userId])\n}\n\nmodel AuditLog {\n  id        String   @id @default(cuid())\n  action    String // tRPC mutation path, e.g. \"admin.users.updateRole\"\n  userId    String? // actor id, null when unauthenticated\n  userEmail String? // actor email snapshot at the time of the action\n  input     String? // sanitized JSON of the mutation input\n  createdAt DateTime @default(now())\n\n  @@index([createdAt])\n}\n",
-  "inlineSchemaHash": "b6e038a7c8d88936a1339498d1704fa74076c3119fe50418dce26b3a3e654f28",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id                  String   @id @default(cuid())\n  email               String   @unique\n  passwordHash        String\n  isTemporaryPassword Boolean  @default(false)\n  role                String   @default(\"USER\") // USER | ADMIN | SUPER_ADMIN\n  createdAt           DateTime @default(now())\n  updatedAt           DateTime @updatedAt\n\n  secrets UserSecret[]\n}\n\nmodel UserSecret {\n  id         String   @id @default(cuid())\n  userId     String\n  key        String // registry key, e.g. \"GITHUB_API_TOKEN\" (see src/lib/secrets.ts)\n  ciphertext String // AES-256-GCM payload: base64(iv).base64(authTag).base64(data)\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n\n  user User @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@unique([userId, key])\n  @@index([userId])\n}\n\nmodel AuditLog {\n  id        String   @id @default(cuid())\n  action    String // tRPC mutation path, e.g. \"admin.users.updateRole\"\n  userId    String? // actor id, null when unauthenticated\n  userEmail String? // actor email snapshot at the time of the action\n  input     String? // sanitized JSON of the mutation input\n  createdAt DateTime @default(now())\n\n  @@index([createdAt])\n}\n\nmodel ConfigVersion {\n  id          String   @id @default(cuid())\n  version     Int      @unique // monotonic, 1-based; highest = active config\n  data        String // JSON snapshot of the whole AppConfig\n  message     String? // optional change description\n  authorId    String? // actor user id, null for the system/seed version\n  authorEmail String? // actor email snapshot at the time of the change\n  createdAt   DateTime @default(now())\n\n  @@index([createdAt])\n}\n",
+  "inlineSchemaHash": "b65d4b1e689aa46cfe106f016e2a2c71455008479ab4e662f3387c9fa4e176d8",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isTemporaryPassword\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"secrets\",\"kind\":\"object\",\"type\":\"UserSecret\",\"relationName\":\"UserToUserSecret\"}],\"dbName\":null},\"UserSecret\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"key\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ciphertext\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserToUserSecret\"}],\"dbName\":null},\"AuditLog\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userEmail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"input\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isTemporaryPassword\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"secrets\",\"kind\":\"object\",\"type\":\"UserSecret\",\"relationName\":\"UserToUserSecret\"}],\"dbName\":null},\"UserSecret\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"key\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ciphertext\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserToUserSecret\"}],\"dbName\":null},\"AuditLog\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userEmail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"input\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"ConfigVersion\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"version\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"data\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"message\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"authorId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"authorEmail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

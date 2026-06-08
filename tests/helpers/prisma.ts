@@ -12,5 +12,6 @@ export const testDb = new PrismaClient({ datasourceUrl: TEST_DATABASE_URL });
 export async function resetDb(): Promise<void> {
   // Order matters only if relations gain `onDelete: Restrict`; harmless here.
   await testDb.auditLog.deleteMany();
+  await testDb.configVersion.deleteMany();
   await testDb.user.deleteMany();
 }

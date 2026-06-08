@@ -6,7 +6,10 @@ export async function register() {
   // Only run in the Node.js runtime — Prisma isn't available on the edge,
   // and this is server-startup work, not request handling.
   if (process.env.NEXT_RUNTIME === "nodejs") {
-    const { ensureBootstrapAdmin } = await import("~/server/bootstrap");
+    const { ensureBootstrapAdmin, ensureBootstrapConfig } = await import(
+      "~/server/bootstrap"
+    );
     await ensureBootstrapAdmin();
+    await ensureBootstrapConfig();
   }
 }

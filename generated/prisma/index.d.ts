@@ -28,6 +28,11 @@ export type UserSecret = $Result.DefaultSelection<Prisma.$UserSecretPayload>
  * 
  */
 export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
+/**
+ * Model ConfigVersion
+ * 
+ */
+export type ConfigVersion = $Result.DefaultSelection<Prisma.$ConfigVersionPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -176,6 +181,16 @@ export class PrismaClient<
     * ```
     */
   get auditLog(): Prisma.AuditLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.configVersion`: Exposes CRUD operations for the **ConfigVersion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ConfigVersions
+    * const configVersions = await prisma.configVersion.findMany()
+    * ```
+    */
+  get configVersion(): Prisma.ConfigVersionDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -619,7 +634,8 @@ export namespace Prisma {
   export const ModelName: {
     User: 'User',
     UserSecret: 'UserSecret',
-    AuditLog: 'AuditLog'
+    AuditLog: 'AuditLog',
+    ConfigVersion: 'ConfigVersion'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -638,7 +654,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSecret" | "auditLog"
+      modelProps: "user" | "userSecret" | "auditLog" | "configVersion"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -864,6 +880,80 @@ export namespace Prisma {
           }
         }
       }
+      ConfigVersion: {
+        payload: Prisma.$ConfigVersionPayload<ExtArgs>
+        fields: Prisma.ConfigVersionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ConfigVersionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ConfigVersionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>
+          }
+          findFirst: {
+            args: Prisma.ConfigVersionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ConfigVersionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>
+          }
+          findMany: {
+            args: Prisma.ConfigVersionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>[]
+          }
+          create: {
+            args: Prisma.ConfigVersionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>
+          }
+          createMany: {
+            args: Prisma.ConfigVersionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ConfigVersionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>[]
+          }
+          delete: {
+            args: Prisma.ConfigVersionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>
+          }
+          update: {
+            args: Prisma.ConfigVersionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>
+          }
+          deleteMany: {
+            args: Prisma.ConfigVersionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ConfigVersionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ConfigVersionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>[]
+          }
+          upsert: {
+            args: Prisma.ConfigVersionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfigVersionPayload>
+          }
+          aggregate: {
+            args: Prisma.ConfigVersionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateConfigVersion>
+          }
+          groupBy: {
+            args: Prisma.ConfigVersionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ConfigVersionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ConfigVersionCountArgs<ExtArgs>
+            result: $Utils.Optional<ConfigVersionCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -963,6 +1053,7 @@ export namespace Prisma {
     user?: UserOmit
     userSecret?: UserSecretOmit
     auditLog?: AuditLogOmit
+    configVersion?: ConfigVersionOmit
   }
 
   /* Types for Logging */
@@ -4243,6 +4334,1059 @@ export namespace Prisma {
 
 
   /**
+   * Model ConfigVersion
+   */
+
+  export type AggregateConfigVersion = {
+    _count: ConfigVersionCountAggregateOutputType | null
+    _avg: ConfigVersionAvgAggregateOutputType | null
+    _sum: ConfigVersionSumAggregateOutputType | null
+    _min: ConfigVersionMinAggregateOutputType | null
+    _max: ConfigVersionMaxAggregateOutputType | null
+  }
+
+  export type ConfigVersionAvgAggregateOutputType = {
+    version: number | null
+  }
+
+  export type ConfigVersionSumAggregateOutputType = {
+    version: number | null
+  }
+
+  export type ConfigVersionMinAggregateOutputType = {
+    id: string | null
+    version: number | null
+    data: string | null
+    message: string | null
+    authorId: string | null
+    authorEmail: string | null
+    createdAt: Date | null
+  }
+
+  export type ConfigVersionMaxAggregateOutputType = {
+    id: string | null
+    version: number | null
+    data: string | null
+    message: string | null
+    authorId: string | null
+    authorEmail: string | null
+    createdAt: Date | null
+  }
+
+  export type ConfigVersionCountAggregateOutputType = {
+    id: number
+    version: number
+    data: number
+    message: number
+    authorId: number
+    authorEmail: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ConfigVersionAvgAggregateInputType = {
+    version?: true
+  }
+
+  export type ConfigVersionSumAggregateInputType = {
+    version?: true
+  }
+
+  export type ConfigVersionMinAggregateInputType = {
+    id?: true
+    version?: true
+    data?: true
+    message?: true
+    authorId?: true
+    authorEmail?: true
+    createdAt?: true
+  }
+
+  export type ConfigVersionMaxAggregateInputType = {
+    id?: true
+    version?: true
+    data?: true
+    message?: true
+    authorId?: true
+    authorEmail?: true
+    createdAt?: true
+  }
+
+  export type ConfigVersionCountAggregateInputType = {
+    id?: true
+    version?: true
+    data?: true
+    message?: true
+    authorId?: true
+    authorEmail?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ConfigVersionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ConfigVersion to aggregate.
+     */
+    where?: ConfigVersionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfigVersions to fetch.
+     */
+    orderBy?: ConfigVersionOrderByWithRelationInput | ConfigVersionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ConfigVersionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfigVersions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfigVersions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ConfigVersions
+    **/
+    _count?: true | ConfigVersionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ConfigVersionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ConfigVersionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ConfigVersionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ConfigVersionMaxAggregateInputType
+  }
+
+  export type GetConfigVersionAggregateType<T extends ConfigVersionAggregateArgs> = {
+        [P in keyof T & keyof AggregateConfigVersion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateConfigVersion[P]>
+      : GetScalarType<T[P], AggregateConfigVersion[P]>
+  }
+
+
+
+
+  export type ConfigVersionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ConfigVersionWhereInput
+    orderBy?: ConfigVersionOrderByWithAggregationInput | ConfigVersionOrderByWithAggregationInput[]
+    by: ConfigVersionScalarFieldEnum[] | ConfigVersionScalarFieldEnum
+    having?: ConfigVersionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ConfigVersionCountAggregateInputType | true
+    _avg?: ConfigVersionAvgAggregateInputType
+    _sum?: ConfigVersionSumAggregateInputType
+    _min?: ConfigVersionMinAggregateInputType
+    _max?: ConfigVersionMaxAggregateInputType
+  }
+
+  export type ConfigVersionGroupByOutputType = {
+    id: string
+    version: number
+    data: string
+    message: string | null
+    authorId: string | null
+    authorEmail: string | null
+    createdAt: Date
+    _count: ConfigVersionCountAggregateOutputType | null
+    _avg: ConfigVersionAvgAggregateOutputType | null
+    _sum: ConfigVersionSumAggregateOutputType | null
+    _min: ConfigVersionMinAggregateOutputType | null
+    _max: ConfigVersionMaxAggregateOutputType | null
+  }
+
+  type GetConfigVersionGroupByPayload<T extends ConfigVersionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ConfigVersionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ConfigVersionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ConfigVersionGroupByOutputType[P]>
+            : GetScalarType<T[P], ConfigVersionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ConfigVersionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    version?: boolean
+    data?: boolean
+    message?: boolean
+    authorId?: boolean
+    authorEmail?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["configVersion"]>
+
+  export type ConfigVersionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    version?: boolean
+    data?: boolean
+    message?: boolean
+    authorId?: boolean
+    authorEmail?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["configVersion"]>
+
+  export type ConfigVersionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    version?: boolean
+    data?: boolean
+    message?: boolean
+    authorId?: boolean
+    authorEmail?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["configVersion"]>
+
+  export type ConfigVersionSelectScalar = {
+    id?: boolean
+    version?: boolean
+    data?: boolean
+    message?: boolean
+    authorId?: boolean
+    authorEmail?: boolean
+    createdAt?: boolean
+  }
+
+  export type ConfigVersionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "version" | "data" | "message" | "authorId" | "authorEmail" | "createdAt", ExtArgs["result"]["configVersion"]>
+
+  export type $ConfigVersionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ConfigVersion"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      version: number
+      data: string
+      message: string | null
+      authorId: string | null
+      authorEmail: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["configVersion"]>
+    composites: {}
+  }
+
+  type ConfigVersionGetPayload<S extends boolean | null | undefined | ConfigVersionDefaultArgs> = $Result.GetResult<Prisma.$ConfigVersionPayload, S>
+
+  type ConfigVersionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ConfigVersionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ConfigVersionCountAggregateInputType | true
+    }
+
+  export interface ConfigVersionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ConfigVersion'], meta: { name: 'ConfigVersion' } }
+    /**
+     * Find zero or one ConfigVersion that matches the filter.
+     * @param {ConfigVersionFindUniqueArgs} args - Arguments to find a ConfigVersion
+     * @example
+     * // Get one ConfigVersion
+     * const configVersion = await prisma.configVersion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ConfigVersionFindUniqueArgs>(args: SelectSubset<T, ConfigVersionFindUniqueArgs<ExtArgs>>): Prisma__ConfigVersionClient<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ConfigVersion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ConfigVersionFindUniqueOrThrowArgs} args - Arguments to find a ConfigVersion
+     * @example
+     * // Get one ConfigVersion
+     * const configVersion = await prisma.configVersion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ConfigVersionFindUniqueOrThrowArgs>(args: SelectSubset<T, ConfigVersionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ConfigVersionClient<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ConfigVersion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfigVersionFindFirstArgs} args - Arguments to find a ConfigVersion
+     * @example
+     * // Get one ConfigVersion
+     * const configVersion = await prisma.configVersion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ConfigVersionFindFirstArgs>(args?: SelectSubset<T, ConfigVersionFindFirstArgs<ExtArgs>>): Prisma__ConfigVersionClient<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ConfigVersion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfigVersionFindFirstOrThrowArgs} args - Arguments to find a ConfigVersion
+     * @example
+     * // Get one ConfigVersion
+     * const configVersion = await prisma.configVersion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ConfigVersionFindFirstOrThrowArgs>(args?: SelectSubset<T, ConfigVersionFindFirstOrThrowArgs<ExtArgs>>): Prisma__ConfigVersionClient<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ConfigVersions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfigVersionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ConfigVersions
+     * const configVersions = await prisma.configVersion.findMany()
+     * 
+     * // Get first 10 ConfigVersions
+     * const configVersions = await prisma.configVersion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const configVersionWithIdOnly = await prisma.configVersion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ConfigVersionFindManyArgs>(args?: SelectSubset<T, ConfigVersionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ConfigVersion.
+     * @param {ConfigVersionCreateArgs} args - Arguments to create a ConfigVersion.
+     * @example
+     * // Create one ConfigVersion
+     * const ConfigVersion = await prisma.configVersion.create({
+     *   data: {
+     *     // ... data to create a ConfigVersion
+     *   }
+     * })
+     * 
+     */
+    create<T extends ConfigVersionCreateArgs>(args: SelectSubset<T, ConfigVersionCreateArgs<ExtArgs>>): Prisma__ConfigVersionClient<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ConfigVersions.
+     * @param {ConfigVersionCreateManyArgs} args - Arguments to create many ConfigVersions.
+     * @example
+     * // Create many ConfigVersions
+     * const configVersion = await prisma.configVersion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ConfigVersionCreateManyArgs>(args?: SelectSubset<T, ConfigVersionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ConfigVersions and returns the data saved in the database.
+     * @param {ConfigVersionCreateManyAndReturnArgs} args - Arguments to create many ConfigVersions.
+     * @example
+     * // Create many ConfigVersions
+     * const configVersion = await prisma.configVersion.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ConfigVersions and only return the `id`
+     * const configVersionWithIdOnly = await prisma.configVersion.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ConfigVersionCreateManyAndReturnArgs>(args?: SelectSubset<T, ConfigVersionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ConfigVersion.
+     * @param {ConfigVersionDeleteArgs} args - Arguments to delete one ConfigVersion.
+     * @example
+     * // Delete one ConfigVersion
+     * const ConfigVersion = await prisma.configVersion.delete({
+     *   where: {
+     *     // ... filter to delete one ConfigVersion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ConfigVersionDeleteArgs>(args: SelectSubset<T, ConfigVersionDeleteArgs<ExtArgs>>): Prisma__ConfigVersionClient<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ConfigVersion.
+     * @param {ConfigVersionUpdateArgs} args - Arguments to update one ConfigVersion.
+     * @example
+     * // Update one ConfigVersion
+     * const configVersion = await prisma.configVersion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ConfigVersionUpdateArgs>(args: SelectSubset<T, ConfigVersionUpdateArgs<ExtArgs>>): Prisma__ConfigVersionClient<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ConfigVersions.
+     * @param {ConfigVersionDeleteManyArgs} args - Arguments to filter ConfigVersions to delete.
+     * @example
+     * // Delete a few ConfigVersions
+     * const { count } = await prisma.configVersion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ConfigVersionDeleteManyArgs>(args?: SelectSubset<T, ConfigVersionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ConfigVersions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfigVersionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ConfigVersions
+     * const configVersion = await prisma.configVersion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ConfigVersionUpdateManyArgs>(args: SelectSubset<T, ConfigVersionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ConfigVersions and returns the data updated in the database.
+     * @param {ConfigVersionUpdateManyAndReturnArgs} args - Arguments to update many ConfigVersions.
+     * @example
+     * // Update many ConfigVersions
+     * const configVersion = await prisma.configVersion.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ConfigVersions and only return the `id`
+     * const configVersionWithIdOnly = await prisma.configVersion.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ConfigVersionUpdateManyAndReturnArgs>(args: SelectSubset<T, ConfigVersionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ConfigVersion.
+     * @param {ConfigVersionUpsertArgs} args - Arguments to update or create a ConfigVersion.
+     * @example
+     * // Update or create a ConfigVersion
+     * const configVersion = await prisma.configVersion.upsert({
+     *   create: {
+     *     // ... data to create a ConfigVersion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ConfigVersion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ConfigVersionUpsertArgs>(args: SelectSubset<T, ConfigVersionUpsertArgs<ExtArgs>>): Prisma__ConfigVersionClient<$Result.GetResult<Prisma.$ConfigVersionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ConfigVersions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfigVersionCountArgs} args - Arguments to filter ConfigVersions to count.
+     * @example
+     * // Count the number of ConfigVersions
+     * const count = await prisma.configVersion.count({
+     *   where: {
+     *     // ... the filter for the ConfigVersions we want to count
+     *   }
+     * })
+    **/
+    count<T extends ConfigVersionCountArgs>(
+      args?: Subset<T, ConfigVersionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ConfigVersionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ConfigVersion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfigVersionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ConfigVersionAggregateArgs>(args: Subset<T, ConfigVersionAggregateArgs>): Prisma.PrismaPromise<GetConfigVersionAggregateType<T>>
+
+    /**
+     * Group by ConfigVersion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfigVersionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ConfigVersionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ConfigVersionGroupByArgs['orderBy'] }
+        : { orderBy?: ConfigVersionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ConfigVersionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetConfigVersionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ConfigVersion model
+   */
+  readonly fields: ConfigVersionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ConfigVersion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ConfigVersionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ConfigVersion model
+   */
+  interface ConfigVersionFieldRefs {
+    readonly id: FieldRef<"ConfigVersion", 'String'>
+    readonly version: FieldRef<"ConfigVersion", 'Int'>
+    readonly data: FieldRef<"ConfigVersion", 'String'>
+    readonly message: FieldRef<"ConfigVersion", 'String'>
+    readonly authorId: FieldRef<"ConfigVersion", 'String'>
+    readonly authorEmail: FieldRef<"ConfigVersion", 'String'>
+    readonly createdAt: FieldRef<"ConfigVersion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ConfigVersion findUnique
+   */
+  export type ConfigVersionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfigVersion to fetch.
+     */
+    where: ConfigVersionWhereUniqueInput
+  }
+
+  /**
+   * ConfigVersion findUniqueOrThrow
+   */
+  export type ConfigVersionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfigVersion to fetch.
+     */
+    where: ConfigVersionWhereUniqueInput
+  }
+
+  /**
+   * ConfigVersion findFirst
+   */
+  export type ConfigVersionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfigVersion to fetch.
+     */
+    where?: ConfigVersionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfigVersions to fetch.
+     */
+    orderBy?: ConfigVersionOrderByWithRelationInput | ConfigVersionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ConfigVersions.
+     */
+    cursor?: ConfigVersionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfigVersions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfigVersions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConfigVersions.
+     */
+    distinct?: ConfigVersionScalarFieldEnum | ConfigVersionScalarFieldEnum[]
+  }
+
+  /**
+   * ConfigVersion findFirstOrThrow
+   */
+  export type ConfigVersionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfigVersion to fetch.
+     */
+    where?: ConfigVersionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfigVersions to fetch.
+     */
+    orderBy?: ConfigVersionOrderByWithRelationInput | ConfigVersionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ConfigVersions.
+     */
+    cursor?: ConfigVersionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfigVersions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfigVersions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConfigVersions.
+     */
+    distinct?: ConfigVersionScalarFieldEnum | ConfigVersionScalarFieldEnum[]
+  }
+
+  /**
+   * ConfigVersion findMany
+   */
+  export type ConfigVersionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfigVersions to fetch.
+     */
+    where?: ConfigVersionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfigVersions to fetch.
+     */
+    orderBy?: ConfigVersionOrderByWithRelationInput | ConfigVersionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ConfigVersions.
+     */
+    cursor?: ConfigVersionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfigVersions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfigVersions.
+     */
+    skip?: number
+    distinct?: ConfigVersionScalarFieldEnum | ConfigVersionScalarFieldEnum[]
+  }
+
+  /**
+   * ConfigVersion create
+   */
+  export type ConfigVersionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ConfigVersion.
+     */
+    data: XOR<ConfigVersionCreateInput, ConfigVersionUncheckedCreateInput>
+  }
+
+  /**
+   * ConfigVersion createMany
+   */
+  export type ConfigVersionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ConfigVersions.
+     */
+    data: ConfigVersionCreateManyInput | ConfigVersionCreateManyInput[]
+  }
+
+  /**
+   * ConfigVersion createManyAndReturn
+   */
+  export type ConfigVersionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * The data used to create many ConfigVersions.
+     */
+    data: ConfigVersionCreateManyInput | ConfigVersionCreateManyInput[]
+  }
+
+  /**
+   * ConfigVersion update
+   */
+  export type ConfigVersionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ConfigVersion.
+     */
+    data: XOR<ConfigVersionUpdateInput, ConfigVersionUncheckedUpdateInput>
+    /**
+     * Choose, which ConfigVersion to update.
+     */
+    where: ConfigVersionWhereUniqueInput
+  }
+
+  /**
+   * ConfigVersion updateMany
+   */
+  export type ConfigVersionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ConfigVersions.
+     */
+    data: XOR<ConfigVersionUpdateManyMutationInput, ConfigVersionUncheckedUpdateManyInput>
+    /**
+     * Filter which ConfigVersions to update
+     */
+    where?: ConfigVersionWhereInput
+    /**
+     * Limit how many ConfigVersions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConfigVersion updateManyAndReturn
+   */
+  export type ConfigVersionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * The data used to update ConfigVersions.
+     */
+    data: XOR<ConfigVersionUpdateManyMutationInput, ConfigVersionUncheckedUpdateManyInput>
+    /**
+     * Filter which ConfigVersions to update
+     */
+    where?: ConfigVersionWhereInput
+    /**
+     * Limit how many ConfigVersions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConfigVersion upsert
+   */
+  export type ConfigVersionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ConfigVersion to update in case it exists.
+     */
+    where: ConfigVersionWhereUniqueInput
+    /**
+     * In case the ConfigVersion found by the `where` argument doesn't exist, create a new ConfigVersion with this data.
+     */
+    create: XOR<ConfigVersionCreateInput, ConfigVersionUncheckedCreateInput>
+    /**
+     * In case the ConfigVersion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ConfigVersionUpdateInput, ConfigVersionUncheckedUpdateInput>
+  }
+
+  /**
+   * ConfigVersion delete
+   */
+  export type ConfigVersionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+    /**
+     * Filter which ConfigVersion to delete.
+     */
+    where: ConfigVersionWhereUniqueInput
+  }
+
+  /**
+   * ConfigVersion deleteMany
+   */
+  export type ConfigVersionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ConfigVersions to delete
+     */
+    where?: ConfigVersionWhereInput
+    /**
+     * Limit how many ConfigVersions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConfigVersion without action
+   */
+  export type ConfigVersionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfigVersion
+     */
+    select?: ConfigVersionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfigVersion
+     */
+    omit?: ConfigVersionOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -4288,6 +5432,19 @@ export namespace Prisma {
   };
 
   export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+  export const ConfigVersionScalarFieldEnum: {
+    id: 'id',
+    version: 'version',
+    data: 'data',
+    message: 'message',
+    authorId: 'authorId',
+    authorEmail: 'authorEmail',
+    createdAt: 'createdAt'
+  };
+
+  export type ConfigVersionScalarFieldEnum = (typeof ConfigVersionScalarFieldEnum)[keyof typeof ConfigVersionScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -4336,6 +5493,13 @@ export namespace Prisma {
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
   /**
    * Deep Input Types
@@ -4523,6 +5687,70 @@ export namespace Prisma {
     userEmail?: StringNullableWithAggregatesFilter<"AuditLog"> | string | null
     input?: StringNullableWithAggregatesFilter<"AuditLog"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"AuditLog"> | Date | string
+  }
+
+  export type ConfigVersionWhereInput = {
+    AND?: ConfigVersionWhereInput | ConfigVersionWhereInput[]
+    OR?: ConfigVersionWhereInput[]
+    NOT?: ConfigVersionWhereInput | ConfigVersionWhereInput[]
+    id?: StringFilter<"ConfigVersion"> | string
+    version?: IntFilter<"ConfigVersion"> | number
+    data?: StringFilter<"ConfigVersion"> | string
+    message?: StringNullableFilter<"ConfigVersion"> | string | null
+    authorId?: StringNullableFilter<"ConfigVersion"> | string | null
+    authorEmail?: StringNullableFilter<"ConfigVersion"> | string | null
+    createdAt?: DateTimeFilter<"ConfigVersion"> | Date | string
+  }
+
+  export type ConfigVersionOrderByWithRelationInput = {
+    id?: SortOrder
+    version?: SortOrder
+    data?: SortOrder
+    message?: SortOrderInput | SortOrder
+    authorId?: SortOrderInput | SortOrder
+    authorEmail?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ConfigVersionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    version?: number
+    AND?: ConfigVersionWhereInput | ConfigVersionWhereInput[]
+    OR?: ConfigVersionWhereInput[]
+    NOT?: ConfigVersionWhereInput | ConfigVersionWhereInput[]
+    data?: StringFilter<"ConfigVersion"> | string
+    message?: StringNullableFilter<"ConfigVersion"> | string | null
+    authorId?: StringNullableFilter<"ConfigVersion"> | string | null
+    authorEmail?: StringNullableFilter<"ConfigVersion"> | string | null
+    createdAt?: DateTimeFilter<"ConfigVersion"> | Date | string
+  }, "id" | "version">
+
+  export type ConfigVersionOrderByWithAggregationInput = {
+    id?: SortOrder
+    version?: SortOrder
+    data?: SortOrder
+    message?: SortOrderInput | SortOrder
+    authorId?: SortOrderInput | SortOrder
+    authorEmail?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: ConfigVersionCountOrderByAggregateInput
+    _avg?: ConfigVersionAvgOrderByAggregateInput
+    _max?: ConfigVersionMaxOrderByAggregateInput
+    _min?: ConfigVersionMinOrderByAggregateInput
+    _sum?: ConfigVersionSumOrderByAggregateInput
+  }
+
+  export type ConfigVersionScalarWhereWithAggregatesInput = {
+    AND?: ConfigVersionScalarWhereWithAggregatesInput | ConfigVersionScalarWhereWithAggregatesInput[]
+    OR?: ConfigVersionScalarWhereWithAggregatesInput[]
+    NOT?: ConfigVersionScalarWhereWithAggregatesInput | ConfigVersionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ConfigVersion"> | string
+    version?: IntWithAggregatesFilter<"ConfigVersion"> | number
+    data?: StringWithAggregatesFilter<"ConfigVersion"> | string
+    message?: StringNullableWithAggregatesFilter<"ConfigVersion"> | string | null
+    authorId?: StringNullableWithAggregatesFilter<"ConfigVersion"> | string | null
+    authorEmail?: StringNullableWithAggregatesFilter<"ConfigVersion"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ConfigVersion"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -4721,6 +5949,76 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     userEmail?: NullableStringFieldUpdateOperationsInput | string | null
     input?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfigVersionCreateInput = {
+    id?: string
+    version: number
+    data: string
+    message?: string | null
+    authorId?: string | null
+    authorEmail?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ConfigVersionUncheckedCreateInput = {
+    id?: string
+    version: number
+    data: string
+    message?: string | null
+    authorId?: string | null
+    authorEmail?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ConfigVersionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    data?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfigVersionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    data?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfigVersionCreateManyInput = {
+    id?: string
+    version: number
+    data: string
+    message?: string | null
+    authorId?: string | null
+    authorEmail?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ConfigVersionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    data?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfigVersionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    data?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorEmail?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -4933,6 +6231,71 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type ConfigVersionCountOrderByAggregateInput = {
+    id?: SortOrder
+    version?: SortOrder
+    data?: SortOrder
+    message?: SortOrder
+    authorId?: SortOrder
+    authorEmail?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ConfigVersionAvgOrderByAggregateInput = {
+    version?: SortOrder
+  }
+
+  export type ConfigVersionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    version?: SortOrder
+    data?: SortOrder
+    message?: SortOrder
+    authorId?: SortOrder
+    authorEmail?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ConfigVersionMinOrderByAggregateInput = {
+    id?: SortOrder
+    version?: SortOrder
+    data?: SortOrder
+    message?: SortOrder
+    authorId?: SortOrder
+    authorEmail?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ConfigVersionSumOrderByAggregateInput = {
+    version?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
   export type UserSecretCreateNestedManyWithoutUserInput = {
     create?: XOR<UserSecretCreateWithoutUserInput, UserSecretUncheckedCreateWithoutUserInput> | UserSecretCreateWithoutUserInput[] | UserSecretUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserSecretCreateOrConnectWithoutUserInput | UserSecretCreateOrConnectWithoutUserInput[]
@@ -5003,6 +6366,14 @@ export namespace Prisma {
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -5125,6 +6496,33 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type UserSecretCreateWithoutUserInput = {
