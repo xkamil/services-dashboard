@@ -20,6 +20,8 @@ type MergedEnvironment = { variables: Record<string, string>; links: LinkMap };
 /** A service after inheritance + placeholder substitution, ready to render. */
 export type ResolvedService = {
   name: string;
+  /** Team or person responsible for the service. */
+  owner: string;
   /** Label → URL, with null/unset links dropped and placeholders substituted. */
   links: Record<string, string>;
   /** Placeholder names that had no value in context (surfaced as warnings). */
@@ -141,6 +143,7 @@ export function resolveService(
 
   return {
     name: service.name,
+    owner: service.owner,
     links: resolveLinks(merged.links, context, unresolved),
     unresolved: [...unresolved],
   };

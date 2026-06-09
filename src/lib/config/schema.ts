@@ -68,6 +68,8 @@ export const environmentBaseSchema = z.object({
 /** A concrete service. Identified by `name`; inherits the service defaults. */
 export const serviceSchema = z.object({
   name: z.string().min(1),
+  /** Team or person responsible for the service. */
+  owner: z.string().default("unknown"),
   links: serviceLinksSchema.default({}),
 });
 

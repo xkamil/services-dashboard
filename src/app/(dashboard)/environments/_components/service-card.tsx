@@ -22,9 +22,10 @@ export function ServiceCard({ service }: { service: ResolvedService }) {
     <Card.Root w="full" borderColor="border">
       <Card.Body py={3}>
         <HStack align="center" gap={4}>
-          <Heading size="md" flex="0 0 50%">
+          <Heading size="md" flex="1">
             {service.name}
           </Heading>
+          <Stack flex="1" />
           <Stack flex="1" gap={2}>
             <Links links={service.links} />
             {service.unresolved.length > 0 && (
@@ -40,6 +41,12 @@ export function ServiceCard({ service }: { service: ResolvedService }) {
               </HStack>
             )}
           </Stack>
+          <HStack flex="1" gap={1}>
+            <Text fontSize="xs" color="fg.muted">
+              Owner:
+            </Text>
+            <Text fontSize="xs">{service.owner}</Text>
+          </HStack>
         </HStack>
       </Card.Body>
     </Card.Root>
