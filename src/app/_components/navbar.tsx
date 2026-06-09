@@ -107,7 +107,15 @@ export function Navbar({ sections }: { sections: NavLink[] }) {
   const visibleSections = isAdmin ? sections.filter(canSee) : [];
 
   return (
-    <Box as="nav" borderBottomWidth="1px" borderColor="border" bg="bg.panel">
+    <Box
+      as="nav"
+      position="sticky"
+      top="0"
+      zIndex="sticky"
+      borderBottomWidth="1px"
+      borderColor="border"
+      bg="bg.panel"
+    >
       <Container maxW="6xl">
         <Flex h="14" align="center" justify="space-between">
           <HStack gap={6} h="full">
@@ -145,7 +153,15 @@ export function SubNav({ links }: { links: NavLink[] }) {
   if (visibleLinks.length === 0) return null;
 
   return (
-    <Box as="nav" borderBottomWidth="1px" borderColor="border" bg="bg.panel">
+    <Box
+      as="nav"
+      position="sticky"
+      top="14"
+      zIndex="docked"
+      borderBottomWidth="1px"
+      borderColor="border"
+      bg="bg.panel"
+    >
       <Container maxW="6xl">
         <HStack gap={6} h="11" fontSize="sm">
           {visibleLinks.map((link) => (

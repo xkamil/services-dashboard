@@ -26,8 +26,13 @@ export function ServiceCard({ service }: { service: ResolvedService }) {
       _hover={{ bg: "bg.muted" }}
     >
       <Card.Body py={3}>
-        <HStack align="center" gap={4}>
-          <Heading size="md" flex="1">
+        <HStack align="center" gap={2}>
+          <Heading
+            size="md"
+            fontWeight="normal"
+            flex="1"
+            _dark={{ color: "fg.muted" }}
+          >
             {service.name}
           </Heading>
           <Stack flex="1" />

@@ -90,9 +90,11 @@ export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
           {filteredServices.length === 0 ? (
             <Text color="fg.muted">No services match the current filters.</Text>
           ) : (
-            filteredServices.map((service) => (
-              <ServiceCard key={service.name} service={service} />
-            ))
+            <Stack gap={2}>
+              {filteredServices.map((service) => (
+                <ServiceCard key={service.name} service={service} />
+              ))}
+            </Stack>
           )}
         </Stack>
       )}
