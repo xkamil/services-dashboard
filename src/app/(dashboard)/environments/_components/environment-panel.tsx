@@ -12,7 +12,7 @@ import { ServiceCard } from "./service-card";
 /** Renders a label→url map as a wrap of icon links. */
 function Links({ links }: { links: Record<string, string> }) {
   return (
-    <Wrap gap={2}>
+    <Wrap gap={4}>
       {Object.entries(links).map(([label, url]) => (
         <IconLink key={label} name={label} url={url} showLabel/>
       ))}
