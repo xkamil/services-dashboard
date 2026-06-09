@@ -13,7 +13,7 @@ export function EnvironmentsNav() {
 
   const links: NavLink[] = (data?.environments ?? []).map((env) => ({
     href: `/environments/${environmentSlug(env.name)}`,
-    label: env.name,
+    label: env.name.toUpperCase(),
   }));
 
   return <SubNav links={links} />;
