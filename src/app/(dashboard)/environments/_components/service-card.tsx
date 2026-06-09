@@ -19,7 +19,12 @@ function Links({ links }: { links: Record<string, string> }) {
 /** A single resolved service rendered as a card with its links. */
 export function ServiceCard({ service }: { service: ResolvedService }) {
   return (
-    <Card.Root w="full" borderColor="border">
+    <Card.Root
+      w="full"
+      borderColor="border"
+      transition="background 0.15s"
+      _hover={{ bg: "bg.muted" }}
+    >
       <Card.Body py={3}>
         <HStack align="center" gap={4}>
           <Heading size="md" flex="1">
