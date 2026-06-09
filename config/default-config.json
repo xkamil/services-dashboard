@@ -3,7 +3,13 @@
   "defaults": {
     "environment": {
       "variables": {},
-      "links": {}
+      "links": {
+        "github": "https://github.com/example",
+        "jenkins": "https://jenkins.${baseDomain}",
+        "kafka": "https://kafka-ui.${baseDomain}",
+        "kibana": "https://kibana.${baseDomain}",
+        "swagger": "https://${baseDomain}/swagger"
+      }
     },
     "service": {
       "links": {}
@@ -11,61 +17,223 @@
   },
   "environments": [
     {
-      "name": "Development",
+      "name": "dev",
       "variables": {
         "baseDomain": "dev.example.com"
       },
-      "links": {
-        "grafana": "https://grafana.${baseDomain}"
-      },
+      "links": {},
       "services": []
     },
     {
-      "name": "Staging",
+      "name": "test",
+      "variables": {
+        "baseDomain": "test.example.com"
+      },
+      "links": {},
+      "services": []
+    },
+    {
+      "name": "stage",
       "variables": {
         "baseDomain": "stage.example.com"
       },
-      "links": {
-        "grafana": "https://grafana.${baseDomain}"
-      },
+      "links": {},
       "services": []
     },
     {
-      "name": "Production",
+      "name": "production",
       "variables": {
         "baseDomain": "example.com"
       },
-      "links": {
-        "grafana": "https://grafana.${baseDomain}",
-        "status_page": "https://status.${baseDomain}"
-      },
-      "services": [
-        {
-          "name": "Payroll Service",
-          "links": {
-            "runbook": "https://wiki.${baseDomain}/payroll-runbook"
-          }
-        }
-      ]
+      "links": {},
+      "services": []
     }
   ],
   "services": [
     {
-      "name": "Auth Service",
+      "name": "auth-service",
+      "owner": "team-falcon",
       "links": {
-        "repository": "https://bitbucket.org/symmetrical/auth-service",
-        "logs": "https://grafana.${baseDomain}/logs/auth-service",
+        "github": "https://github.com/example/auth-service",
         "swagger": "https://auth.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/auth-service",
         "kafka": "https://kafka-ui.${baseDomain}/auth-service"
       }
     },
     {
-      "name": "Payroll Service",
+      "name": "payroll-service",
+      "owner": "team-orca",
       "links": {
-        "repository": "https://bitbucket.org/symmetrical/payroll-service",
-        "logs": "https://grafana.${baseDomain}/logs/payroll-service",
-        "swagger": null,
+        "github": "https://github.com/example/payroll-service",
+        "swagger": "https://payroll.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/payroll-service",
         "kafka": "https://kafka-ui.${baseDomain}/payroll-service"
+      }
+    },
+    {
+      "name": "user-service",
+      "owner": "team-falcon",
+      "links": {
+        "github": "https://github.com/example/user-service",
+        "swagger": "https://user.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/user-service"
+      }
+    },
+    {
+      "name": "notification-service",
+      "owner": "team-lynx",
+      "links": {
+        "github": "https://github.com/example/notification-service",
+        "swagger": "https://notification.${baseDomain}/swagger-ui.html",
+        "kafka": "https://kafka-ui.${baseDomain}/notification-service"
+      }
+    },
+    {
+      "name": "billing-service",
+      "owner": "team-orca",
+      "links": {
+        "github": "https://github.com/example/billing-service",
+        "swagger": "https://billing.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/billing-service",
+        "jenkins": "https://jenkins.${baseDomain}/job/billing-service"
+      }
+    },
+    {
+      "name": "report-service",
+      "owner": "team-yeti",
+      "links": {
+        "github": "https://github.com/example/report-service",
+        "swagger": "https://report.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/report-service"
+      }
+    },
+    {
+      "name": "document-service",
+      "owner": "team-yeti",
+      "links": {
+        "github": "https://github.com/example/document-service",
+        "swagger": "https://document.${baseDomain}/swagger-ui.html",
+        "kafka": "https://kafka-ui.${baseDomain}/document-service"
+      }
+    },
+    {
+      "name": "search-service",
+      "owner": "team-lynx",
+      "links": {
+        "github": "https://github.com/example/search-service",
+        "kibana": "https://kibana.${baseDomain}/app/logs/search-service",
+        "jenkins": "https://jenkins.${baseDomain}/job/search-service"
+      }
+    },
+    {
+      "name": "gateway-service",
+      "owner": "team-falcon",
+      "links": {
+        "github": "https://github.com/example/gateway-service",
+        "swagger": "https://gateway.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/gateway-service",
+        "jenkins": "https://jenkins.${baseDomain}/job/gateway-service"
+      }
+    },
+    {
+      "name": "scheduler-service",
+      "owner": "team-lynx",
+      "links": {
+        "github": "https://github.com/example/scheduler-service",
+        "kafka": "https://kafka-ui.${baseDomain}/scheduler-service",
+        "kibana": "https://kibana.${baseDomain}/app/logs/scheduler-service"
+      }
+    },
+    {
+      "name": "audit-service",
+      "owner": "team-yeti",
+      "links": {
+        "github": "https://github.com/example/audit-service",
+        "swagger": "https://audit.${baseDomain}/swagger-ui.html",
+        "kafka": "https://kafka-ui.${baseDomain}/audit-service"
+      }
+    },
+    {
+      "name": "email-service",
+      "owner": "team-lynx",
+      "links": {
+        "github": "https://github.com/example/email-service",
+        "swagger": "https://email.${baseDomain}/swagger-ui.html",
+        "kafka": "https://kafka-ui.${baseDomain}/email-service"
+      }
+    },
+    {
+      "name": "import-service",
+      "owner": "team-orca",
+      "links": {
+        "github": "https://github.com/example/import-service",
+        "kibana": "https://kibana.${baseDomain}/app/logs/import-service",
+        "jenkins": "https://jenkins.${baseDomain}/job/import-service"
+      }
+    },
+    {
+      "name": "export-service",
+      "owner": "team-orca",
+      "links": {
+        "github": "https://github.com/example/export-service",
+        "kibana": "https://kibana.${baseDomain}/app/logs/export-service",
+        "kafka": "https://kafka-ui.${baseDomain}/export-service"
+      }
+    },
+    {
+      "name": "config-service",
+      "owner": "team-falcon",
+      "links": {
+        "github": "https://github.com/example/config-service",
+        "swagger": "https://config.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/config-service"
+      }
+    },
+    {
+      "name": "analytics-service",
+      "owner": "team-yeti",
+      "links": {
+        "github": "https://github.com/example/analytics-service",
+        "swagger": "https://analytics.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/analytics-service",
+        "kafka": "https://kafka-ui.${baseDomain}/analytics-service"
+      }
+    },
+    {
+      "name": "inventory-service",
+      "owner": "team-orca",
+      "links": {
+        "github": "https://github.com/example/inventory-service",
+        "swagger": "https://inventory.${baseDomain}/swagger-ui.html",
+        "jenkins": "https://jenkins.${baseDomain}/job/inventory-service"
+      }
+    },
+    {
+      "name": "catalog-service",
+      "owner": "team-lynx",
+      "links": {
+        "github": "https://github.com/example/catalog-service",
+        "swagger": "https://catalog.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/catalog-service"
+      }
+    },
+    {
+      "name": "payment-service",
+      "owner": "team-orca",
+      "links": {
+        "github": "https://github.com/example/payment-service",
+        "swagger": "https://payment.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/payment-service",
+        "kafka": "https://kafka-ui.${baseDomain}/payment-service"
+      }
+    },
+    {
+      "name": "session-service",
+      "owner": "team-falcon",
+      "links": {
+        "github": "https://github.com/example/session-service",
+        "swagger": "https://session.${baseDomain}/swagger-ui.html",
+        "kibana": "https://kibana.${baseDomain}/app/logs/session-service"
       }
     }
   ]

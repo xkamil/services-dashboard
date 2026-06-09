@@ -10,10 +10,23 @@ import { db } from "~/server/db";
 const BOOTSTRAP_ADMIN_EMAIL = "admin";
 const BOOTSTRAP_ADMIN_PASSWORD = "admin";
 
+/** Shared default password for the seeded example users. */
+const BOOTSTRAP_USER_PASSWORD = "password";
+
+/** The example users seeded alongside the first-run admin. */
+const BOOTSTRAP_USERS = [
+  ...Array.from({ length: 5 }, (_, i) => ({
+    email: `user${i + 1}@example.com`,
+    role: "USER" as const,
+  })),
+  { email: "admin@example.com", role: "ADMIN" as const },
+];
+
 /**
  * On a fresh database (no users yet), create a default admin account so the app
- * is usable immediately. The email "admin" is intentionally not a valid email —
- * the login schema accepts it (registration still requires a real email).
+ * is usable immediately, plus a set of example users for testing. The email
+ * "admin" is intentionally not a valid email — the login schema accepts it
+ * (registration still requires a real email).
  *
  * Idempotent: does nothing once any user exists.
  */
@@ -34,6 +47,21 @@ export async function ensureBootstrapAdmin(): Promise<void> {
 
   console.log(
     `[bootstrap] Created default admin user (email: "${BOOTSTRAP_ADMIN_EMAIL}", password: "${BOOTSTRAP_ADMIN_PASSWORD}")`,
+  );
+
+  const userPasswordHash = await bcrypt.hash(BOOTSTRAP_USER_PASSWORD, 12);
+
+  await db.user.createMany({
+    data: BOOTSTRAP_USERS.map(({ email, role }) => ({
+      email,
+      passwordHash: userPasswordHash,
+      isTemporaryPassword: false,
+      role,
+    })),
+  });
+
+  console.log(
+    `[bootstrap] Created ${BOOTSTRAP_USERS.length} example users (password: "${BOOTSTRAP_USER_PASSWORD}")`,
   );
 }
 
