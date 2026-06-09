@@ -1,13 +1,13 @@
 "use client";
 
-import { Box, Center, HStack, Link, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Center, HStack, Image, Link, Text } from "@chakra-ui/react";
+import { useState } from "react";
 
 export interface IconLinkProps {
   /** Icon name — resolves to `/icons/{name}.svg` in the public folder. */
   name: string;
   /** Optional URL. When set, the icon becomes a link. */
-  url?: string;
+  url: string;
   /** Box size of the icon in pixels. */
   size?: number;
   /**
@@ -22,13 +22,12 @@ export interface IconLinkProps {
 }
 
 /**
- * Loads `/icons/{name}.svg` and inlines it into the DOM. Inlining (rather
- * than an `<img src>`) lets monochrome icons that use `fill="currentColor"`
- * inherit the theme foreground (`color="fg"`), so they stay visible on both
- * light and dark themes. Multicolor icons keep their own explicit fills.
+ * Renders `/icons/{name}.svg` as a native image, letting the browser load and
+ * cache the asset (no runtime `fetch`).
  *
- * If the asset is missing, falls back to the first letter of the name in a
- * circle. Keyed by `name` from the parent so state resets on name change.
+ * If the asset is missing or fails to load, falls back to the first letter of
+ * the name in a circle. Keyed by `name` from the parent so state resets on name
+ * change.
  */
 function IconImage({
   name,
@@ -39,19 +38,7 @@ function IconImage({
   size: number;
   title?: string;
 }) {
-  const [svg, setSvg] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    fetch(`/icons/${name}.svg`)
-      .then((res) => (res.ok ? res.text() : Promise.reject(new Error("missing"))))
-      .then((text) => active && setSvg(text))
-      .catch(() => active && setFailed(true));
-    return () => {
-      active = false;
-    };
-  }, [name]);
 
   if (failed) {
     return (
@@ -61,7 +48,8 @@ function IconImage({
         bg="bg.muted"
         color="fg"
         fontWeight="bold"
-        fontSize={`${Math.round(size * 0.7)}px`}
+        fontSize={`${Math.round(size * 1.2)}px`}
+        paddingBottom={"5px"}
         textTransform="uppercase"
         userSelect="none"
         aria-label={name}
@@ -73,14 +61,12 @@ function IconImage({
   }
 
   return (
-    <Box
+    <Image
+      src={`/icons/${name}.svg`}
       boxSize={`${size}px`}
-      color="fg"
-      role="img"
-      aria-label={name}
+      alt={name}
       title={title}
-      css={{ "& svg": { width: "100%", height: "100%", display: "block" } }}
-      dangerouslySetInnerHTML={svg ? { __html: svg } : undefined}
+      onError={() => setFailed(true)}
     />
   );
 }
@@ -98,25 +84,21 @@ export function IconLink({
   showLabel = false,
 }: IconLinkProps) {
   const text = label ?? name;
-  // Show the tooltip only when the label isn't already rendered as text.
-  const tooltip = showLabel ? undefined : text;
   const content = showLabel ? (
     <HStack gap={2}>
       <IconImage key={name} name={name} size={size} />
       <Text>{text}</Text>
     </HStack>
   ) : (
-    <IconImage key={name} name={name} size={size} title={tooltip} />
+    <IconImage key={name} name={name} size={size} title={url} />
   );
-
-  if (!url) return content;
 
   return (
     <Link
       href={url}
       target={target}
       rel={target === "_blank" ? "noopener noreferrer" : undefined}
-      title={tooltip}
+      title={url}
       display="inline-flex"
       lineHeight={0}
       _hover={{ opacity: 0.8, textDecoration: showLabel ? "underline" : "none" }}
