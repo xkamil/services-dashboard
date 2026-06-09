@@ -75,6 +75,7 @@ export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
                 placeholder="filter by owner..."
                 value={ownerFilter}
                 onChange={(e) => setOwnerFilter(e.currentTarget.value)}
+                color={ownerFilter === "" ? "fg.muted" : undefined}
               >
                 {owners.map(({ owner, count }) => (
                   <option key={owner} value={owner}>

@@ -2,9 +2,11 @@
 
 import {
   Box,
+  Button,
   Field,
   HStack,
   Input,
+  Link,
   Skeleton,
   Stack,
   Table,
@@ -12,12 +14,14 @@ import {
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
+import { AppDialog } from "~/app/_components/dialog-utils";
 import { SearchInput } from "~/app/_components/search-input";
 import { formatDateTime } from "~/lib/format";
 import { MAX_AUDIT_RANGE_DAYS } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const MAX_DETAILS_LENGTH = 200;
 
 function toDateInput(date: Date) {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -72,6 +76,7 @@ export function AuditLogTable() {
   const [from, setFrom] = useState(defaultFrom);
   const [to, setTo] = useState(today);
   const [filter, setFilter] = useState("");
+  const [selectedDetails, setSelectedDetails] = useState<string | null>(null);
 
   // Bounds that keep the selected window within MAX_AUDIT_RANGE_DAYS.
   const fromMin = toDateInput(
@@ -198,7 +203,26 @@ export function AuditLogTable() {
                       fontFamily="mono"
                       wordBreak="break-all"
                     >
-                      {formatDetails(log.input)}
+                      {(() => {
+                        const details = formatDetails(log.input);
+                        if (details.length <= MAX_DETAILS_LENGTH) {
+                          return details;
+                        }
+                        return (
+                          <>
+                            {details.slice(0, MAX_DETAILS_LENGTH)}…{" "}
+                            <Link
+                              as="button"
+                              type="button"
+                              color="fg.info"
+                              fontFamily="body"
+                              onClick={() => setSelectedDetails(details)}
+                            >
+                              more
+                            </Link>
+                          </>
+                        );
+                      })()}
                     </Table.Cell>
                   </Table.Row>
                 ))
@@ -207,6 +231,27 @@ export function AuditLogTable() {
           </Table.Root>
         </Box>
       )}
+
+      <AppDialog
+        open={selectedDetails !== null}
+        onClose={() => setSelectedDetails(null)}
+        title="Details"
+        maxW="5xl"
+        footer={
+          <Button variant="outline" onClick={() => setSelectedDetails(null)}>
+            Close
+          </Button>
+        }
+      >
+        <Text
+          fontSize="sm"
+          fontFamily="mono"
+          whiteSpace="pre-wrap"
+          wordBreak="break-word"
+        >
+          {selectedDetails}
+        </Text>
+      </AppDialog>
     </Stack>
   );
 }

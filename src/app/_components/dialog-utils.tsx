@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, Portal } from "@chakra-ui/react";
+import { Dialog, Portal, type DialogContentProps } from "@chakra-ui/react";
 import { useRef, type ReactNode } from "react";
 
 /**
@@ -19,6 +19,7 @@ export function AppDialog({
   onClose,
   title,
   role,
+  maxW,
   closeOnInteractOutside,
   children,
   footer,
@@ -27,6 +28,7 @@ export function AppDialog({
   onClose: () => void;
   title: string;
   role?: "dialog" | "alertdialog";
+  maxW?: DialogContentProps["maxW"];
   closeOnInteractOutside?: boolean;
   children: ReactNode;
   footer: ReactNode;
@@ -43,7 +45,7 @@ export function AppDialog({
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content>
+          <Dialog.Content maxW={maxW}>
             <Dialog.Header>
               <Dialog.Title>{title}</Dialog.Title>
             </Dialog.Header>
