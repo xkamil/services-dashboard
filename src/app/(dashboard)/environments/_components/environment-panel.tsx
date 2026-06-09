@@ -9,10 +9,16 @@ import type { ResolvedEnvironment } from "~/lib/config/resolve";
 
 import { ServiceCard } from "./service-card";
 
-/** Renders a label→url map as a wrap of icon links. */
+/** Renders a label→url map as a wrap of icon links, separated below by a line. */
 function Links({ links }: { links: Record<string, string> }) {
   return (
-    <Wrap gap={4}>
+    <Wrap
+      gap={4}
+      mt={-4}
+      pb={4}
+      borderBottomWidth="1px"
+      borderColor="border.emphasized"
+    >
       {Object.entries(links).map(([label, url]) => (
         <IconLink key={label} name={label} url={url} showLabel/>
       ))}
