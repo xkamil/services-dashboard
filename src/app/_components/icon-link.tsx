@@ -62,7 +62,7 @@ function IconImage({
 
   return (
     <Image
-      src={`/icons/${name}.svg`}
+      src={`/icons/${name.toLowerCase()}.svg`}
       boxSize={`${size}px`}
       alt={name}
       title={title}
