@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { RefreshButton } from "~/app/_components/refresh-button";
 import { RoleBadge } from "~/app/_components/role-badge";
 import { SearchInput } from "~/app/_components/search-input";
 import { formatDateTime } from "~/lib/format";
@@ -55,7 +56,12 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 }
 
 export function UsersTable() {
-  const { data: users, isLoading } = api.admin.users.list.useQuery();
+  const {
+    data: users,
+    isLoading,
+    isFetching,
+    refetch,
+  } = api.admin.users.list.useQuery();
   const { data: session } = api.auth.me.useQuery();
   const canManage = !!session && hasMinRole(session.role, "SUPER_ADMIN");
 
@@ -118,12 +124,19 @@ export function UsersTable() {
 
   return (
     <Stack gap={4}>
-      <SearchInput
-        placeholder="Filter by ID, email, or role…"
-        value={filter}
-        onChange={setFilter}
-        maxW="sm"
-      />
+      <HStack gap={4} align="center">
+        <SearchInput
+          placeholder="Filter by ID, email, or role…"
+          value={filter}
+          onChange={setFilter}
+          maxW="sm"
+        />
+        <RefreshButton
+          loading={isFetching}
+          onRefresh={() => void refetch()}
+          ml="auto"
+        />
+      </HStack>
 
       {isLoading ? (
         <Stack gap={2}>
@@ -199,8 +212,7 @@ export function UsersTable() {
                                       setEditingRole({
                                         id: user.id,
                                         email: user.email,
-                                        role:
-                                          coerceRole(user.role) ?? "USER",
+                                        role: coerceRole(user.role) ?? "USER",
                                       })
                                     }
                                   >

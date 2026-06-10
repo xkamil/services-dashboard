@@ -24,9 +24,10 @@ export const createQueryClient = () => {
     mutationCache,
     defaultOptions: {
       queries: {
-        // With SSR, we usually want to set some default staleTime
-        // above 0 to avoid refetching immediately on the client
-        staleTime: 30 * 1000,
+        // Short stale window: revisiting a page after a few seconds refetches
+        // fresh data, while still de-duping rapid back-and-forth navigation and
+        // avoiding an immediate refetch right after SSR hydration.
+        staleTime: 5 * 1000,
       },
       dehydrate: {
         serializeData: SuperJSON.serialize,
