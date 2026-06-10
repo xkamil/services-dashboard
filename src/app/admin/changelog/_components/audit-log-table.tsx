@@ -15,6 +15,7 @@ import {
 import { useMemo, useState } from "react";
 
 import { AppDialog } from "~/app/_components/dialog-utils";
+import { RefreshButton } from "~/app/_components/refresh-button";
 import { SearchInput } from "~/app/_components/search-input";
 import { formatDateTime } from "~/lib/format";
 import { MAX_AUDIT_RANGE_DAYS } from "~/lib/validation/admin";
@@ -83,7 +84,12 @@ export function AuditLogTable() {
     new Date(endOfDay(to).getTime() - MAX_AUDIT_RANGE_DAYS * DAY_MS),
   );
 
-  const { data: logs, isLoading } = api.admin.audit.list.useQuery({
+  const {
+    data: logs,
+    isLoading,
+    isFetching,
+    refetch,
+  } = api.admin.audit.list.useQuery({
     from: startOfDay(from),
     to: endOfDay(to),
   });
@@ -152,11 +158,8 @@ export function AuditLogTable() {
             onChange={setFilter}
           />
         </Field.Root>
+        <RefreshButton loading={isFetching} onRefresh={() => void refetch()} />
       </HStack>
-
-      <Text fontSize="xs" color="fg.muted">
-        Showing up to {MAX_AUDIT_RANGE_DAYS} days of changes.
-      </Text>
 
       {isLoading ? (
         <Stack gap={2}>
