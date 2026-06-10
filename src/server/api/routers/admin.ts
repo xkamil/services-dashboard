@@ -68,14 +68,12 @@ const usersRouter = createTRPCRouter({
 });
 
 const auditRouter = createTRPCRouter({
-  list: adminProcedure
-    .input(auditLogListSchema)
-    .query(({ ctx, input }) => {
-      return ctx.db.auditLog.findMany({
-        where: { createdAt: { gte: input.from, lte: input.to } },
-        orderBy: { createdAt: "desc" },
-      });
-    }),
+  list: adminProcedure.input(auditLogListSchema).query(({ ctx, input }) => {
+    return ctx.db.auditLog.findMany({
+      where: { createdAt: { gte: input.from, lte: input.to } },
+      orderBy: { createdAt: "desc" },
+    });
+  }),
 });
 
 export const adminRouter = createTRPCRouter({
