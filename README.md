@@ -11,7 +11,7 @@ workflow, and a role-based permission system. Bootstrapped with the
 | Framework          | [Next.js 15](https://nextjs.org) (App Router, React 19, Turbopack dev)  |
 | UI                 | [Chakra UI v3](https://chakra-ui.com) + [next-themes](https://github.com/pacocoursey/next-themes) for light/dark |
 | API layer          | [tRPC v11](https://trpc.io) with [React Query](https://tanstack.com/query) and [superjson](https://github.com/blitz-js/superjson) |
-| Database / ORM     | [Prisma 6](https://prisma.io) on SQLite                                  |
+| Database / ORM     | [Prisma 6](https://prisma.io) on MongoDB                                 |
 | Auth & sessions    | [iron-session](https://github.com/vvo/iron-session) (encrypted cookies) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js) password hashing |
 | Forms & validation | [react-hook-form](https://react-hook-form.com) + [zod](https://zod.dev) (via `@hookform/resolvers`) |
 | Env validation     | [@t3-oss/env-nextjs](https://env.t3.gg)                                 |
@@ -27,6 +27,15 @@ workflow, and a role-based permission system. Bootstrapped with the
 
 - Node.js 20+
 - npm 11+
+- MongoDB **running as a replica set** — required by the Prisma MongoDB connector
+  (it wraps writes in transactions). A free [MongoDB Atlas](https://www.mongodb.com/atlas)
+  cluster already is one. For local development, the bundled Compose file starts a
+  single-node replica set and initiates it automatically:
+  ```bash
+  docker compose up -d
+  ```
+  It listens on **port 27018** (not the default 27017, so it never collides with a
+  test database) and is reached with `?directConnection=true` — see `.env.example`.
 
 ### Setup
 
@@ -40,10 +49,11 @@ cp .env.example .env
 
 Set the following variables in `.env`:
 
-| Variable         | Description                                                  |
-| ---------------- | ------------------------------------------------------------ |
-| `DATABASE_URL`   | SQLite connection string, e.g. `file:./db.sqlite`            |
-| `SESSION_SECRET` | Secret used to encrypt session cookies — **min. 32 chars**   |
+| Variable                 | Description                                                              |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `DATABASE_URL`           | MongoDB connection string with a db name, e.g. `mongodb://localhost:27018/dashboard?directConnection=true` or an Atlas `mongodb+srv://…/dashboard` URL |
+| `SESSION_SECRET`         | Secret used to encrypt session cookies — **min. 32 chars**              |
+| `SECRETS_ENCRYPTION_KEY` | Base64 of 32 random bytes (~44 chars); encrypts per-user secrets at rest |
 
 > Note: `.env.example` still carries the default create-t3-app placeholders
 > (`AUTH_SECRET`, Discord vars). Those are unused — the variables the app
@@ -174,14 +184,52 @@ prisma/
 | `npm run typecheck`   | `tsc --noEmit`                               |
 | `npm run format:write`| Prettier write (`format:check` to verify)    |
 | `npm run test`        | Run Vitest once (`test:watch` for watch mode)|
-| `npm run db:push`     | Push schema to the database (no migration)   |
-| `npm run db:generate` | Create & apply a dev migration               |
-| `npm run db:migrate`  | Apply migrations (deploy)                    |
+| `npm run db:push`     | Push schema (collections + indexes) to MongoDB |
 | `npm run db:studio`   | Open Prisma Studio                           |
+
+> Prisma's MongoDB connector has no migration engine, so `prisma migrate`
+> (`db:generate` / `db:migrate`) does not apply — schema/index changes are
+> synced with `npm run db:push`.
+
+## Testing
+
+The Vitest suite runs against its **own** MongoDB (database `dashboard_test`),
+kept separate from the dev database so a test run never touches your dev data. It
+defaults to a replica set on the default port **27017** — distinct from the dev
+Compose DB on 27018. Start one and run the suite:
+
+```bash
+# A throwaway single-node replica set on 27017 (CI uses an equivalent)
+docker run --name dashboard-test-db -p 27017:27017 -d mongo:7 --replSet rs0
+docker exec dashboard-test-db mongosh --quiet --eval "rs.initiate()"
+
+npm test
+```
+
+Override the target with `TEST_DATABASE_URL` if you want a different host/port.
 
 ## Notes
 
-- The database is **SQLite** (`prisma/db.sqlite`) — convenient for local/internal
-  use. Swap the Prisma datasource for Postgres/MySQL if you need a server DB.
+- The database is **MongoDB** (via the Prisma MongoDB connector), which requires
+  the server to run as a **replica set** — Prisma uses transactions internally
+  even for simple writes. Atlas clusters already are replica sets; locally, use a
+  single-node replica set (see Prerequisites). Run `npm run db:push` once against
+  your database to create the unique indexes (`User.email`,
+  `UserSecret[userId,key]`, `ConfigVersion.version`) before relying on them.
 - Sessions are stored in encrypted cookies (no server-side session store), so
   scaling out requires only a shared `SESSION_SECRET`.
+
+## Deployment (Vercel + MongoDB Atlas)
+
+1. Create a free **M0** cluster on [MongoDB Atlas](https://www.mongodb.com/atlas),
+   add a database user, and under **Network Access** allow `0.0.0.0/0` (Vercel's
+   egress IPs are dynamic).
+2. In Vercel → **Settings → Environment Variables**, set `DATABASE_URL` (the Atlas
+   `mongodb+srv://…/dashboard` string, db name included), `SESSION_SECRET`, and
+   `SECRETS_ENCRYPTION_KEY`. `NODE_ENV` is set by Vercel automatically.
+3. Create the indexes on Atlas once (and after any schema/index change):
+   ```bash
+   DATABASE_URL=<atlas-url> npx prisma db push
+   ```
+   First-run seeding (default admin + initial config) happens automatically on
+   server boot via `src/instrumentation.ts`.

@@ -18,6 +18,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Prisma's MongoDB connector wraps writes in transactions, which require a
+      # replica set. This spins up a single-node replica set on localhost:27017.
+      - name: Start MongoDB (single-node replica set)
+        uses: supercharge/mongodb-github-action@1.12.0
+        with:
+          mongodb-version: "7.0"
+          mongodb-replica-set: rs0
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
@@ -40,12 +48,15 @@ jobs:
         env:
           # Dummy values just to satisfy env validation during the build; no
           # database is contacted at build time.
-          DATABASE_URL: "file:./prisma/db.sqlite"
+          DATABASE_URL: "mongodb://localhost:27017/db"
           SESSION_SECRET: "ci-build-session-secret-min-32-characters-long"
           # Base64-encoded 32 bytes (44 chars) to satisfy the schema's length check.
           SECRETS_ENCRYPTION_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
-      # The Vitest config injects its own NODE_ENV / DATABASE_URL / SESSION_SECRET
-      # and the global setup runs `prisma db push` against a disposable SQLite DB.
+      # The Vitest config injects its own NODE_ENV / SESSION_SECRET, and the
+      # global setup runs `prisma db push` against the replica set started above
+      # (via TEST_DATABASE_URL).
       - name: Run tests
         run: npm test
+        env:
+          TEST_DATABASE_URL: "mongodb://localhost:27017/dashboard_test?directConnection=true"

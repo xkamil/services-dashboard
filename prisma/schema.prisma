@@ -4,12 +4,12 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "mongodb"
     url      = env("DATABASE_URL")
 }
 
 model User {
-    id                  String   @id @default(cuid())
+    id                  String   @id @default(cuid()) @map("_id")
     email               String   @unique
     passwordHash        String
     isTemporaryPassword Boolean  @default(false)
@@ -21,7 +21,7 @@ model User {
 }
 
 model UserSecret {
-    id         String   @id @default(cuid())
+    id         String   @id @default(cuid()) @map("_id")
     userId     String
     key        String // registry key, e.g. "GITHUB_API_TOKEN" (see src/lib/secrets.ts)
     ciphertext String // AES-256-GCM payload: base64(iv).base64(authTag).base64(data)
@@ -35,7 +35,7 @@ model UserSecret {
 }
 
 model AuditLog {
-    id        String   @id @default(cuid())
+    id        String   @id @default(cuid()) @map("_id")
     action    String // tRPC mutation path, e.g. "admin.users.updateRole"
     userId    String? // actor id, null when unauthenticated
     userEmail String? // actor email snapshot at the time of the action
@@ -46,7 +46,7 @@ model AuditLog {
 }
 
 model ConfigVersion {
-    id          String   @id @default(cuid())
+    id          String   @id @default(cuid()) @map("_id")
     version     Int      @unique // monotonic, 1-based; highest = active config
     data        String // JSON snapshot of the whole AppConfig
     message     String? // optional change description

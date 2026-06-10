@@ -1,0 +1,31 @@
+# Local development database.
+#
+# A single-node MongoDB replica set (required by the Prisma MongoDB connector,
+# which wraps writes in transactions). Published on host port 27018 — NOT the
+# default 27017 — so it never collides with a test MongoDB (the suite expects one
+# on 27017). Connect with `?directConnection=true`; see `.env.example`.
+#
+#   docker compose up -d     # start (auto-initiates the replica set)
+#   docker compose down      # stop, keep data
+#   docker compose down -v    # stop and wipe data
+services:
+  mongo:
+    image: mongo:7
+    container_name: dashboard-db
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27018:27017"
+    volumes:
+      - dashboard-mongo-data:/data/db
+    # Idempotently initiates the replica set: report healthy once it's PRIMARY,
+    # otherwise run rs.initiate() (which throws harmlessly once already set up).
+    healthcheck:
+      test: >-
+        mongosh --quiet --eval "try { rs.status().ok } catch (e) { rs.initiate().ok }"
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 5s
+
+volumes:
+  dashboard-mongo-data:

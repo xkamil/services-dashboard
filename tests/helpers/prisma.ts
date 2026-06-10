@@ -10,8 +10,10 @@ export const testDb = new PrismaClient({ datasourceUrl: TEST_DATABASE_URL });
 
 /** Wipes all rows so each test starts from a known-empty database. */
 export async function resetDb(): Promise<void> {
-  // Order matters only if relations gain `onDelete: Restrict`; harmless here.
+  // MongoDB has no DB-level cascade (it's Prisma-emulated), so clear UserSecret
+  // explicitly rather than relying on the User relation to take it down.
   await testDb.auditLog.deleteMany();
   await testDb.configVersion.deleteMany();
+  await testDb.userSecret.deleteMany();
   await testDb.user.deleteMany();
 }
