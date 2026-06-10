@@ -5,6 +5,12 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  // Ensure the Prisma query engine binary is bundled into Vercel's
+  // serverless functions (Next.js tracing doesn't pick up the .so.node otherwise).
+  outputFileTracingIncludes: {
+    "/**/*": ["./generated/prisma/**/*"],
+  },
+};
 
 export default config;
