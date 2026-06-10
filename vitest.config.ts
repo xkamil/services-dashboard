@@ -8,8 +8,8 @@ export default defineConfig({
   test: {
     include: ["tests/**/*.test.ts"],
     globalSetup: ["./tests/setup/global-setup.ts"],
-    // All test files share one SQLite file and reset it between tests, so they
-    // must not run in parallel against the same database.
+    // All test files share one MongoDB database and reset it between tests, so
+    // they must not run in parallel against the same database.
     fileParallelism: false,
     env: {
       NODE_ENV: "test",
