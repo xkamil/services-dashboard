@@ -58,9 +58,9 @@ describe("admin.config.save", () => {
     expect(second.version).toBe(2);
   });
 
-  it("rejects DEV callers with FORBIDDEN", async () => {
-    const dev = await createUser({ email: "dev@test.local", role: "DEV" });
-    const { caller } = createTestCaller(sessionFor(dev));
+  it("rejects non-admin callers with FORBIDDEN", async () => {
+    const user = await createUser({ email: "user@test.local", role: "USER" });
+    const { caller } = createTestCaller(sessionFor(user));
     await expect(
       caller.admin.config.save({ data: makeConfig() }),
     ).rejects.toMatchObject({ code: "FORBIDDEN" });

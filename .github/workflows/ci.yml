@@ -42,6 +42,8 @@ jobs:
           # database is contacted at build time.
           DATABASE_URL: "file:./prisma/db.sqlite"
           SESSION_SECRET: "ci-build-session-secret-min-32-characters-long"
+          # Base64-encoded 32 bytes (44 chars) to satisfy the schema's length check.
+          SECRETS_ENCRYPTION_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
       # The Vitest config injects its own NODE_ENV / DATABASE_URL / SESSION_SECRET
       # and the global setup runs `prisma db push` against a disposable SQLite DB.
