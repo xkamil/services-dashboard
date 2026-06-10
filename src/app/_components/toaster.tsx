@@ -2,13 +2,17 @@
 
 import {
   Toaster as ChakraToaster,
-  Collapsible,
+  Box,
+  Button,
   Portal,
   Stack,
   Text,
   Toast,
   createToaster,
 } from "@chakra-ui/react";
+import { useState } from "react";
+
+import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
 
 export const toaster = createToaster({
   placement: "bottom-end",
@@ -25,13 +29,17 @@ const TYPE_COLOR_PALETTE: Record<string, string> = {
 };
 
 export function Toaster() {
+  const [details, setDetails] = useState<string | null>(null);
+  // Keep the text rendered through the dialog's close animation.
+  const shownDetails = useLastValue(details);
+
   return (
     <Portal>
       <ChakraToaster toaster={toaster} insetInline={{ mdDown: "4" }}>
         {(toast) => {
           const colorPalette =
             TYPE_COLOR_PALETTE[toast.type ?? "info"] ?? "gray";
-          const details =
+          const toastDetails =
             typeof toast.meta?.details === "string"
               ? toast.meta.details
               : undefined;
@@ -44,28 +52,20 @@ export function Toaster() {
                 {toast.description && (
                   <Toast.Description>{toast.description}</Toast.Description>
                 )}
-                {details && (
-                  <Collapsible.Root mt="1">
-                    <Collapsible.Trigger
-                      cursor="pointer"
-                      fontSize="xs"
-                      fontWeight="medium"
-                      textDecoration="underline"
-                    >
-                      Details
-                    </Collapsible.Trigger>
-                    <Collapsible.Content>
-                      <Text
-                        mt="1"
-                        fontSize="xs"
-                        whiteSpace="pre-wrap"
-                        wordBreak="break-word"
-                        opacity={0.9}
-                      >
-                        {details}
-                      </Text>
-                    </Collapsible.Content>
-                  </Collapsible.Root>
+                {toastDetails && (
+                  <Button
+                    variant="plain"
+                    size="xs"
+                    alignSelf="flex-start"
+                    px="0"
+                    mt="1"
+                    fontSize="xs"
+                    fontWeight="medium"
+                    textDecoration="underline"
+                    onClick={() => setDetails(toastDetails)}
+                  >
+                    View details
+                  </Button>
                 )}
               </Stack>
               {toast.closable && <Toast.CloseTrigger />}
@@ -73,6 +73,23 @@ export function Toaster() {
           );
         }}
       </ChakraToaster>
+      <AppDialog
+        open={!!details}
+        onClose={() => setDetails(null)}
+        title="Error details"
+        maxW="lg"
+        footer={
+          <Button variant="ghost" onClick={() => setDetails(null)}>
+            Close
+          </Button>
+        }
+      >
+        <Box maxH="60vh" overflowY="auto">
+          <Text fontSize="sm" whiteSpace="pre-wrap" wordBreak="break-word">
+            {shownDetails}
+          </Text>
+        </Box>
+      </AppDialog>
     </Portal>
   );
 }
