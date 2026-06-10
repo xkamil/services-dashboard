@@ -63,6 +63,9 @@ export const authRouter = createTRPCRouter({
     ctx.ironSession.email = user.email;
     ctx.ironSession.role = user.role;
     ctx.ironSession.isTemporaryPassword = user.isTemporaryPassword;
+    // Start the trust window: the role is honored as-is until this stamp ages
+    // past MAX_SESSION_AGE_MS, after which the backend re-validates it.
+    ctx.ironSession.refreshedAt = Date.now();
     await ctx.ironSession.save();
 
     return { requiresPasswordChange: user.isTemporaryPassword };
