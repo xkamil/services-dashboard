@@ -18,26 +18,21 @@ function Links({ links }: { links: Record<string, string> }) {
   );
 }
 
-// TODO: temporary sample versions for testing VersionBadge — replace with real
-// data once versions are wired into ResolvedService. Deterministic by service
-// name so each card stays stable across renders (no hydration mismatch).
-const SAMPLE_VERSIONS: Array<[string?, string?]> = [
-  ["1.4.2", "1.4.0"], // greater → up / green
-  ["2.0.0", "2.0.0"], // equal → equal / blue
-  ["1.2.3", "1.3.0"], // less → down / red
-  [undefined, "1.0.0"], // unknown → ? / gray
-  ["1.2.3-feat-some-new-feature", "1.2.3"], // suffixed → greater + truncated
-];
-
-function sampleVersions(seed: string): [string?, string?] {
-  let hash = 0;
-  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return SAMPLE_VERSIONS[hash % SAMPLE_VERSIONS.length]!;
-}
-
 /** A single resolved service rendered as a card with its links. */
-export function ServiceCard({ service }: { service: ResolvedService }) {
-  const [version, versionToCompareWith] = sampleVersions(service.name);
+export function ServiceCard({
+  service,
+  version,
+  versionToCompareWith,
+  versionLoading,
+}: {
+  service: ResolvedService;
+  /** Deployed version of this service, fetched by the parent panel. */
+  version?: string;
+  /** Reference version the badge compares `version` against. */
+  versionToCompareWith?: string;
+  /** While true the version is still being fetched. */
+  versionLoading?: boolean;
+}) {
   return (
     <Card.Root
       w="full"
@@ -61,6 +56,7 @@ export function ServiceCard({ service }: { service: ResolvedService }) {
             <VersionBadge
               version={version}
               versionToCompareWith={versionToCompareWith}
+              loading={versionLoading}
             />
           </HStack>
 

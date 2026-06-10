@@ -4,10 +4,14 @@ import { HStack, NativeSelect, Stack, Text, Wrap } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
 import { IconLink } from "~/app/_components/icon-link";
+import { RefreshButton } from "~/app/_components/refresh-button";
 import { SearchInput } from "~/app/_components/search-input";
 import type { ResolvedEnvironment } from "~/lib/config/resolve";
+import { type Comparison, compareVersions } from "~/lib/version";
+import { api } from "~/trpc/react";
 
 import { ServiceCard } from "./service-card";
+import { VersionFilter, type VersionFilterValue } from "./version-filter";
 
 /** Renders a label→url map as a wrap of icon links, separated below by a line. */
 function Links({ links }: { links: Record<string, string> }) {
@@ -29,6 +33,60 @@ function Links({ links }: { links: Record<string, string> }) {
 export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
   const [nameFilter, setNameFilter] = useState("");
   const [ownerFilter, setOwnerFilter] = useState("");
+  const [versionFilter, setVersionFilter] = useState<VersionFilterValue>("");
+
+  const utils = api.useUtils();
+
+  // Versions are fetched per service per environment; httpBatchLink collapses
+  // these into a single request, and each query is cached by env+service name.
+  const versionQueries = api.useQueries((t) =>
+    env.services.map((service) =>
+      t.version.getForService({
+        envName: env.name,
+        serviceName: service.name,
+      }),
+    ),
+  );
+
+  const versionData = env.services.map((service, i) => ({
+    name: service.name,
+    version: versionQueries[i]?.data?.version,
+    versionToCompareWith: versionQueries[i]?.data?.versionToCompareWith,
+  }));
+  const versionKey = JSON.stringify(versionData);
+
+  // Per-service fetch state (covers both the initial load and refreshes) plus a
+  // single flag for the refresh button's spinner.
+  const versionLoadingByService = new Map<string, boolean>();
+  env.services.forEach((service, i) => {
+    versionLoadingByService.set(service.name, versionQueries[i]?.isFetching ?? false);
+  });
+  const anyVersionFetching = versionQueries.some((q) => q.isFetching);
+
+  // Comparison category, fetched versions, and per-category counts for every
+  // service. `versionData` is rebuilt each render, so memoize on `versionKey`
+  // (its serialized contents) rather than the unstable array reference.
+  const { comparisonByService, versionByService, versionCounts } = useMemo(() => {
+    const comparisonByService = new Map<string, Comparison>();
+    const versionByService = new Map<
+      string,
+      { version?: string; versionToCompareWith?: string }
+    >();
+    const versionCounts: Record<Comparison, number> = {
+      greater: 0,
+      equal: 0,
+      less: 0,
+      unknown: 0,
+    };
+    for (const { name, version, versionToCompareWith } of versionData) {
+      const comparison = compareVersions(version, versionToCompareWith);
+      comparisonByService.set(name, comparison);
+      versionByService.set(name, { version, versionToCompareWith });
+      versionCounts[comparison] += 1;
+    }
+    return { comparisonByService, versionByService, versionCounts };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [versionKey]);
 
   // Each owner with the number of services they own, sorted by owner name.
   const owners = useMemo(() => {
@@ -46,9 +104,11 @@ export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
     return env.services.filter(
       (service) =>
         (query === "" || service.name.toLowerCase().includes(query)) &&
-        (ownerFilter === "" || service.owner === ownerFilter),
+        (ownerFilter === "" || service.owner === ownerFilter) &&
+        (versionFilter === "" ||
+          comparisonByService.get(service.name) === versionFilter),
     );
-  }, [env.services, nameFilter, ownerFilter]);
+  }, [env.services, nameFilter, ownerFilter, versionFilter, comparisonByService]);
 
   return (
     <Stack gap={6}>
@@ -58,42 +118,66 @@ export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
         <Text color="fg.muted">No services configured for this environment.</Text>
       ) : (
         <Stack gap={3}>
-          <HStack
-            gap={3}
-            align="center"
-            w="full"
-            maxW={{ base: "full", md: "md", xl: "sm" }}
-          >
-            <SearchInput
-              flex="1"
-              value={nameFilter}
-              onChange={setNameFilter}
-              placeholder="filter by name..."
+          <HStack gap={3} align="center" w="full">
+            <HStack
+              gap={3}
+              align="center"
+              w="full"
+              maxW={{ base: "full", md: "2xl" }}
+            >
+              <SearchInput
+                flex="1"
+                size="md"
+                value={nameFilter}
+                onChange={setNameFilter}
+                placeholder="filter by name..."
+              />
+              <NativeSelect.Root flex="1" size="md">
+                <NativeSelect.Field
+                  placeholder="filter by owner..."
+                  value={ownerFilter}
+                  onChange={(e) => setOwnerFilter(e.currentTarget.value)}
+                  color={ownerFilter === "" ? "fg.muted" : undefined}
+                >
+                  {owners.map(({ owner, count }) => (
+                    <option key={owner} value={owner}>
+                      {owner} ({count})
+                    </option>
+                  ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
+              <VersionFilter
+                value={versionFilter}
+                onChange={setVersionFilter}
+                counts={versionCounts}
+              />
+            </HStack>
+            <RefreshButton
+              size="md"
+              flex="none"
+              ms="auto"
+              loading={anyVersionFetching}
+              onRefresh={() => void utils.version.getForService.invalidate()}
             />
-            <NativeSelect.Root flex="1">
-              <NativeSelect.Field
-                placeholder="filter by owner..."
-                value={ownerFilter}
-                onChange={(e) => setOwnerFilter(e.currentTarget.value)}
-                color={ownerFilter === "" ? "fg.muted" : undefined}
-              >
-                {owners.map(({ owner, count }) => (
-                  <option key={owner} value={owner}>
-                    {owner} ({count})
-                  </option>
-                ))}
-              </NativeSelect.Field>
-              <NativeSelect.Indicator />
-            </NativeSelect.Root>
           </HStack>
 
           {filteredServices.length === 0 ? (
             <Text color="fg.muted">No services match the current filters.</Text>
           ) : (
             <Stack gap={2}>
-              {filteredServices.map((service) => (
-                <ServiceCard key={service.name} service={service} />
-              ))}
+              {filteredServices.map((service) => {
+                const v = versionByService.get(service.name);
+                return (
+                  <ServiceCard
+                    key={service.name}
+                    service={service}
+                    version={v?.version}
+                    versionToCompareWith={v?.versionToCompareWith}
+                    versionLoading={versionLoadingByService.get(service.name)}
+                  />
+                );
+              })}
             </Stack>
           )}
         </Stack>
