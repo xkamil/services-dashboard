@@ -22,9 +22,6 @@ export const CURRENT_SCHEMA_VERSION = 1 as const;
  */
 const linkUrl = z.string().min(1).nullable();
 
-/** Link keys are lowercase letters and underscores only (validated centrally). */
-export const LINK_KEY_RE = /^[a-z_]+$/;
-
 /**
  * A service's links, keyed by label. The named keys below are the links the
  * schema recognises for every service; any of them may be `null`, and arbitrary
@@ -132,43 +129,9 @@ export const appConfigSchema = z
       });
     }
 
-    // Link keys must be lowercase letters / underscores only, everywhere.
-    const checkLinkKeys = (
-      links: Record<string, unknown> | undefined,
-      basePath: (string | number)[],
-    ) => {
-      for (const key of Object.keys(links ?? {})) {
-        if (!LINK_KEY_RE.test(key)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Link key "${key}" must contain only lowercase letters and underscores`,
-            path: [...basePath, key],
-          });
-        }
-      }
-    };
-
-    checkLinkKeys(config.defaults.service.links, ["defaults", "service", "links"]);
-    checkLinkKeys(config.defaults.environment.links, [
-      "defaults",
-      "environment",
-      "links",
-    ]);
-    config.services.forEach((svc, i) => {
-      checkLinkKeys(svc.links, ["services", i, "links"]);
-    });
-
-    // Every service an environment overrides must exist; check env + override links.
+    // Every service an environment overrides must exist.
     config.environments.forEach((env, envIdx) => {
-      checkLinkKeys(env.links, ["environments", envIdx, "links"]);
       env.services.forEach((svc, svcIdx) => {
-        checkLinkKeys(svc.links, [
-          "environments",
-          envIdx,
-          "services",
-          svcIdx,
-          "links",
-        ]);
         if (!serviceNames.has(svc.name)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
