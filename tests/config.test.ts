@@ -22,7 +22,9 @@ function makeConfig(overrides?: Partial<ConfigInput>): AppConfig {
       environment: { variables: {}, links: {} },
       service: { links: {} },
     },
-    environments: [{ name: "Development", variables: {}, links: {}, services: [] }],
+    environments: [
+      { name: "Development", type: "TEST", variables: {}, links: {}, services: [] },
+    ],
     services: [{ name: "Auth" }],
     ...overrides,
   });

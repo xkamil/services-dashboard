@@ -19,6 +19,7 @@ function makeConfig(): AppConfig {
     environments: [
       {
         name: "Development",
+        type: "TEST",
         variables: { host: "dev.example.com" },
         links: { grafana: "https://g.${host}" },
         // Per-environment override for one service (no `overrides` wrapper).
