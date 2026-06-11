@@ -10,9 +10,9 @@ type RefreshButtonProps = Omit<IconButtonProps, "aria-label" | "children"> & {
 };
 
 /**
- * Outline icon button that re-fetches a table's data. Pass a query's `refetch`
- * as `onRefresh` and its `isFetching` as `loading`. Extra props (e.g. `ml`)
- * pass through to the underlying IconButton for placement.
+ * Ghost icon button that re-fetches a table's data. Pass a query's `refetch`
+ * as `onRefresh` and its `isFetching` as `loading`. Extra props (e.g. `ml`,
+ * `variant`) pass through to the underlying IconButton for placement/styling.
  */
 export function RefreshButton({
   loading,
@@ -23,7 +23,7 @@ export function RefreshButton({
     <IconButton
       aria-label="Refresh data"
       title="Refresh data"
-      variant="outline"
+      variant="ghost"
       loading={loading}
       onClick={onRefresh}
       {...buttonProps}
