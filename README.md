@@ -109,7 +109,7 @@ Checks are hierarchical via `hasMinRole(role, min)` and enforced in three places
 
 1. **Edge middleware** ([`src/middleware.ts`](src/middleware.ts)) — `/admin/*`
    requires `ADMIN`+; unauthenticated users are redirected to `/login`.
-2. **tRPC procedures** ([`src/server/api/trpc.ts`](src/server/api/trpc.ts)) —
+2. **tRPC procedures** ([`src/server/api/trpc/procedures.ts`](src/server/api/trpc/procedures.ts)) —
    `protectedProcedure` requires a session; `adminProcedure` requires `ADMIN`;
    `superAdminProcedure` requires `SUPER_ADMIN`.
 3. **UI** — components use `ROLE_META` / `hasMinRole` to show or hide controls.
@@ -141,7 +141,7 @@ admin resets a password, a temporary one is generated and the account is flagged
 
 Every successful admin mutation (any tRPC path under `admin.*`) is recorded to
 the `AuditLog` table by middleware in
-[`src/server/api/trpc.ts`](src/server/api/trpc.ts), capturing the action, the
+[`src/server/api/trpc/middlewares.ts`](src/server/api/trpc/middlewares.ts), capturing the action, the
 acting user, a sanitized snapshot of the input, and a timestamp. Admins browse
 it on the **Changelog** page, filtered by date range.
 

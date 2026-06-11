@@ -8,11 +8,11 @@ import {
   resetPasswordSchema,
   updateUserRoleSchema,
 } from "~/lib/validation/admin";
+import { createTRPCRouter } from "~/server/api/trpc/init";
 import {
   adminProcedure,
-  createTRPCRouter,
   superAdminProcedure,
-} from "~/server/api/trpc";
+} from "~/server/api/trpc/procedures";
 import { configRouter } from "~/server/api/routers/config";
 
 const usersRouter = createTRPCRouter({
