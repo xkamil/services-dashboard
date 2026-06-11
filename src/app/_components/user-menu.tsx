@@ -8,15 +8,10 @@ import {
   Menu,
   Portal,
   Stack,
-  Switch,
   Text,
-  HStack,
 } from "@chakra-ui/react";
-import { Moon, Sun } from "lucide-react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
 import { ROLE_META, coerceRole } from "~/lib/roles";
 import { api } from "~/trpc/react";
@@ -36,11 +31,6 @@ export function UserMenu() {
   const logout = api.auth.logout.useMutation({
     onSuccess: () => router.push("/login"),
   });
-
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const isDark = mounted && resolvedTheme === "dark";
 
   const { openSecrets } = useSecrets();
 
@@ -90,32 +80,6 @@ export function UserMenu() {
               </Menu.Item>
               <Menu.Item value="secrets" onSelect={openSecrets}>
                 Secrets
-              </Menu.Item>
-              <Menu.Separator />
-              <Menu.Item
-                value="theme"
-                closeOnSelect={false}
-                onSelect={() => setTheme(isDark ? "light" : "dark")}
-              >
-                <HStack justify="space-between" w="full">
-                  <HStack gap={2}>
-                    {isDark ? (
-                      <Moon size={16} aria-hidden />
-                    ) : (
-                      <Sun size={16} aria-hidden />
-                    )}
-                    <Text>Dark mode</Text>
-                  </HStack>
-                  <Switch.Root
-                    size="sm"
-                    checked={isDark}
-                    pointerEvents="none"
-                    aria-hidden
-                  >
-                    <Switch.HiddenInput tabIndex={-1} />
-                    <Switch.Control />
-                  </Switch.Root>
-                </HStack>
               </Menu.Item>
               <Menu.Separator />
               <Menu.Item

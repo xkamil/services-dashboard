@@ -9,6 +9,7 @@ import { hasMinRole, type Role } from "~/lib/roles";
 import { api } from "~/trpc/react";
 
 import { UserMenu } from "./user-menu";
+import { ViewOptionsMenu } from "./view-options-menu";
 
 export type NavLink = {
   href: string;
@@ -133,7 +134,10 @@ export function Navbar({ sections }: { sections: NavLink[] }) {
               </HStack>
             )}
           </HStack>
-          <UserMenu />
+          <HStack gap={1}>
+            <ViewOptionsMenu />
+            <UserMenu />
+          </HStack>
         </Flex>
       </Container>
     </Box>
