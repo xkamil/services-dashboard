@@ -1,8 +1,26 @@
 # Services Dashboard
 
-An internal services dashboard with self-registration, an admin-gated approval
-workflow, and a role-based permission system. Bootstrapped with the
-[T3 Stack](https://create.t3.gg/).
+An internal dashboard that gives each environment a single view of its services
+— their links (repo, logs, Swagger, …), owner, and deployed-version status —
+driven by an editable, versioned configuration. Includes cookie-based auth with
+a role hierarchy and an admin area for user management, the config editor, and
+an audit log. Bootstrapped with the [T3 Stack](https://create.t3.gg/).
+
+## What it does
+
+- **Environments & services** — browse environments, each listing its services
+  with icon links, owner, and a version badge comparing the deployed version to
+  a reference (newer / same / older / unknown). Filter services by name, owner,
+  and version status.
+- **Versioned configuration** — the whole dashboard is rendered from one JSON
+  `AppConfig` (environments, services, links, per-environment variables with
+  `${placeholder}` substitution). Every save appends a new version; admins can
+  view history, diff versions, and revert from the config editor.
+- **Per-user secrets** — users can store personal secrets (e.g. a Jenkins API
+  token) the backend uses to reach upstream systems. Encrypted at rest with
+  AES-256-GCM and never returned to the client.
+- **Auth & roles** — self-registration, encrypted-cookie sessions, and a
+  three-tier role hierarchy gating the admin area.
 
 ## Tech stack
 
@@ -14,6 +32,7 @@ workflow, and a role-based permission system. Bootstrapped with the
 | Database / ORM     | [Prisma 6](https://prisma.io) on MongoDB                                 |
 | Auth & sessions    | [iron-session](https://github.com/vvo/iron-session) (encrypted cookies) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js) password hashing |
 | Forms & validation | [react-hook-form](https://react-hook-form.com) + [zod](https://zod.dev) (via `@hookform/resolvers`) |
+| Config editor      | [Monaco](https://github.com/suren-atoyan/monaco-react)                  |
 | Env validation     | [@t3-oss/env-nextjs](https://env.t3.gg)                                 |
 | Tooling            | TypeScript, ESLint, Prettier, [Vitest](https://vitest.dev)              |
 
@@ -55,10 +74,6 @@ Set the following variables in `.env`:
 | `SESSION_SECRET`         | Secret used to encrypt session cookies — **min. 32 chars**              |
 | `SECRETS_ENCRYPTION_KEY` | Base64 of 32 random bytes (~44 chars); encrypts per-user secrets at rest |
 
-> Note: `.env.example` still carries the default create-t3-app placeholders
-> (`AUTH_SECRET`, Discord vars). Those are unused — the variables the app
-> actually validates live in `src/env.js`.
-
 ```bash
 # 3. Apply the schema to a fresh database
 npm run db:push
@@ -67,86 +82,68 @@ npm run db:push
 npm run dev
 ```
 
-### First-run admin
+### First run (seeding)
 
-On a fresh database (no users yet), the app auto-creates a default
-super-admin account on startup so it's usable immediately:
+On a fresh database, the app seeds itself on startup (via the Next.js
+`instrumentation` hook → [`src/server/bootstrap.ts`](src/server/bootstrap.ts)),
+idempotently — it does nothing once data exists:
 
-- **Email:** `admin`
-- **Password:** `admin`
+- A default super-admin: **`admin` / `admin`** (change this after first login).
+- Example users for testing: `user1..5@example.com` (USER) and
+  `admin@example.com` (ADMIN), all with password `password`.
+- Initial configuration (version 1) from
+  [`config/default-config.json`](config/default-config.json).
 
-This runs from the Next.js `instrumentation` startup hook
-(`src/server/bootstrap.ts`) and is idempotent — it does nothing once any user
-exists. Change this password after first login.
+## Roles & permissions
 
-## How roles & permissions work
+Three roles form a strict hierarchy, defined as a single source of truth in
+[`src/lib/roles.ts`](src/lib/roles.ts):
 
-There are four roles, defined as a single source of truth in
-[`src/lib/roles.ts`](src/lib/roles.ts). They form a strict hierarchy ordered by
-rank — a higher rank implies every privilege of the ranks below it.
+| Role          | Rank | Label       | Badge color |
+| ------------- | ---- | ----------- | ----------- |
+| `USER`        | 0    | User        | green       |
+| `ADMIN`       | 1    | Admin       | orange      |
+| `SUPER_ADMIN` | 2    | Super admin | red         |
 
-| Role            | Rank | Label         | Badge color |
-| --------------- | ---- | ------------- | ----------- |
-| `NON_TECHNICAL` | 0    | Non-technical | green       |
-| `DEV`           | 1    | Developer     | purple      |
-| `ADMIN`         | 2    | Admin         | orange      |
-| `SUPER_ADMIN`   | 3    | Super admin   | red         |
+Checks are hierarchical via `hasMinRole(role, min)` and enforced in three places:
 
-Permission checks are hierarchical via `hasMinRole(role, min)` — "does this
-user meet or exceed the required role?" This is enforced in three places:
-
-1. **Edge middleware** ([`src/middleware.ts`](src/middleware.ts)) — gates page
-   routes. `/admin/*` requires `ADMIN` or higher; unauthenticated users are
-   redirected to `/login`.
+1. **Edge middleware** ([`src/middleware.ts`](src/middleware.ts)) — `/admin/*`
+   requires `ADMIN`+; unauthenticated users are redirected to `/login`.
 2. **tRPC procedures** ([`src/server/api/trpc.ts`](src/server/api/trpc.ts)) —
    `protectedProcedure` requires a session; `adminProcedure` requires `ADMIN`;
    `superAdminProcedure` requires `SUPER_ADMIN`.
 3. **UI** — components use `ROLE_META` / `hasMinRole` to show or hide controls.
 
-### What each role can do
+**What each role can do:**
 
-- **Admin** — view the user list and the changelog (audit log).
-- **Super admin** — everything admins can do, **plus** managing other users:
-  change roles, change account status, reset passwords, and delete users.
-  (You cannot delete your own account.)
-- **Developer / Non-technical** — standard dashboard access; no admin area.
+- **User** — full dashboard access (environments, services, own secrets); no
+  admin area.
+- **Admin** — the above, plus the admin area: edit the configuration, view the
+  user list, and browse the changelog.
+- **Super admin** — everything admins can, plus managing other users: change
+  roles, reset passwords, and delete users (you cannot delete your own account).
 
-## Account lifecycle (status)
+> Logged-in roles are trusted from the cookie for a short window
+> (`SESSION_MAX_AGE_SECONDS`, default 60s), after which the role is re-validated
+> against the database and the cookie rewritten — so a role change takes effect
+> within the window rather than persisting until logout.
 
-Each user has a `status` independent of their role. A role only takes effect
-once the account is `ACTIVE`.
+### Registration & login
 
-| Status                  | Meaning                                                       |
-| ----------------------- | ------------------------------------------------------------ |
-| `PENDING_VERIFICATION`  | Self-registered, awaiting super-admin approval. Cannot log in. |
-| `ACTIVE`                | Approved — can log in and use the app.                       |
-| `BLOCKED`               | Disabled by an admin. Cannot log in.                         |
-
-Flow:
-
-1. **Registration** — anyone can self-register with an email, password, and a
-   requested role. New accounts start as `PENDING_VERIFICATION`; the requested
-   role has no effect until activation. The very first registered user becomes
-   an `ACTIVE` `SUPER_ADMIN` (a defensive fallback — the bootstrap admin
-   normally already exists).
-2. **Activation** — a super admin sets the account to `ACTIVE` (and adjusts the
-   role if needed) from the Users admin page.
-3. **Login** — blocked and pending accounts are rejected with a clear message.
-
-### Temporary passwords
-
-When a super admin resets a user's password, a temporary password is generated
-and the account is flagged `isTemporaryPassword`. On next login the user is
-forced through `/change-password` before they can access anything else
-(enforced in middleware).
+Anyone can self-register with an email and password; new accounts are plain,
+active `USER`s. The very first registered user becomes a `SUPER_ADMIN` (a
+defensive fallback — the bootstrap admin normally already exists). When a super
+admin resets a password, a temporary one is generated and the account is flagged
+`isTemporaryPassword`; on next login the user is forced through
+`/change-password` (enforced in middleware) before accessing anything else.
 
 ## Audit log (changelog)
 
 Every successful admin mutation (any tRPC path under `admin.*`) is recorded to
-an `AuditLog` table by middleware in
-[`src/server/api/trpc.ts`](src/server/api/trpc.ts). Each entry captures the
-action, the acting user, a sanitized snapshot of the input, and a timestamp.
-Admins can browse it on the **Changelog** admin page, filtered by date range.
+the `AuditLog` table by middleware in
+[`src/server/api/trpc.ts`](src/server/api/trpc.ts), capturing the action, the
+acting user, a sanitized snapshot of the input, and a timestamp. Admins browse
+it on the **Changelog** page, filtered by date range.
 
 ## Project structure
 
@@ -154,21 +151,27 @@ Admins can browse it on the **Changelog** admin page, filtered by date range.
 src/
   app/
     (auth)/        login, register, change-password
-    (dashboard)/   main authenticated dashboard
-    admin/         users management + changelog (ADMIN+ only)
-    _components/   shared UI (navbar, badges, toaster, ...)
+    (dashboard)/   environments list + per-environment service view
+    admin/         users, config editor, changelog (ADMIN+ only)
+    _components/   shared UI (navbar, badges, toaster, refresh, ...)
   server/
-    api/           tRPC routers (auth, admin) and procedure helpers
-    auth.ts        iron-session config
-    bootstrap.ts   first-run admin creation
+    api/routers/   tRPC routers: auth, admin (users/audit/config), secrets, version
+    auth.ts        iron-session config + session refresh
+    bootstrap.ts   first-run admin, example users, initial config
+    secrets/       per-user secret encryption (AES-256-GCM)
     audit.ts       audit-log recording
     db.ts          Prisma client
   lib/
     roles.ts       role hierarchy (source of truth)
+    secrets.ts     supported per-user secrets (source of truth)
+    config/        AppConfig schema, resolve (merge + placeholders), diff
+    version.ts     semver comparison for the version badge
     validation/    zod schemas
   middleware.ts    route-level auth & role gating
+config/
+  default-config.json   seed configuration (bootstrapped as version 1)
 prisma/
-  schema.prisma    User + AuditLog models
+  schema.prisma    User, UserSecret, AuditLog, ConfigVersion models
 ```
 
 ## Scripts
@@ -188,15 +191,14 @@ prisma/
 | `npm run db:studio`   | Open Prisma Studio                           |
 
 > Prisma's MongoDB connector has no migration engine, so `prisma migrate`
-> (`db:generate` / `db:migrate`) does not apply — schema/index changes are
-> synced with `npm run db:push`.
+> does not apply — schema/index changes are synced with `npm run db:push`.
 
 ## Testing
 
 The Vitest suite runs against its **own** MongoDB (database `dashboard_test`),
-kept separate from the dev database so a test run never touches your dev data. It
-defaults to a replica set on the default port **27017** — distinct from the dev
-Compose DB on 27018. Start one and run the suite:
+kept separate from the dev database. It defaults to a replica set on the default
+port **27017** — distinct from the dev Compose DB on 27018. Start one and run the
+suite:
 
 ```bash
 # A throwaway single-node replica set on 27017 (CI uses an equivalent)
@@ -206,16 +208,14 @@ docker exec dashboard-test-db mongosh --quiet --eval "rs.initiate()"
 npm test
 ```
 
-Override the target with `TEST_DATABASE_URL` if you want a different host/port.
+Override the target with `TEST_DATABASE_URL` for a different host/port.
 
 ## Notes
 
-- The database is **MongoDB** (via the Prisma MongoDB connector), which requires
-  the server to run as a **replica set** — Prisma uses transactions internally
-  even for simple writes. Atlas clusters already are replica sets; locally, use a
-  single-node replica set (see Prerequisites). Run `npm run db:push` once against
-  your database to create the unique indexes (`User.email`,
-  `UserSecret[userId,key]`, `ConfigVersion.version`) before relying on them.
+- MongoDB must run as a **replica set** — Prisma uses transactions internally
+  even for simple writes. Run `npm run db:push` once to create the unique indexes
+  (`User.email`, `UserSecret[userId,key]`, `ConfigVersion.version`) before
+  relying on them.
 - Sessions are stored in encrypted cookies (no server-side session store), so
   scaling out requires only a shared `SESSION_SECRET`.
 
@@ -231,5 +231,5 @@ Override the target with `TEST_DATABASE_URL` if you want a different host/port.
    ```bash
    DATABASE_URL=<atlas-url> npx prisma db push
    ```
-   First-run seeding (default admin + initial config) happens automatically on
-   server boot via `src/instrumentation.ts`.
+   First-run seeding (default admin, example users, initial config) happens
+   automatically on server boot via `src/instrumentation.ts`.
