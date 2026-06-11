@@ -1,7 +1,6 @@
 "use client";
 
-import { Box, Container, Flex, HStack, Link, Text } from "@chakra-ui/react";
-import { LayoutGrid } from "lucide-react";
+import { Box, Container, Flex, HStack, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -89,12 +88,7 @@ function useCanSee() {
 
 export function Navbar({ sections }: { sections: NavLink[] }) {
   const pathname = usePathname();
-  const { data: session } = api.auth.me.useQuery();
   const canSee = useCanSee();
-
-  // Only admins navigate between top-level sections; everyone else has just the
-  // dashboard, so the section tabs are redundant and hidden for them.
-  const isAdmin = !!session && hasMinRole(session.role, "ADMIN");
 
   const visibleSections = sections.filter(canSee);
 
@@ -111,15 +105,15 @@ export function Navbar({ sections }: { sections: NavLink[] }) {
       <Container maxW="6xl">
         <Flex h="14" align="center" justify="space-between">
           <HStack gap={6} h="full">
-              <HStack gap={6} h="full" fontSize="sm">
-                {visibleSections.map((section) => (
-                  <NavTab
-                    key={section.href}
-                    link={section}
-                    active={isActive(pathname, section)}
-                  />
-                ))}
-              </HStack>
+            <HStack gap={6} h="full" fontSize="sm">
+              {visibleSections.map((section) => (
+                <NavTab
+                  key={section.href}
+                  link={section}
+                  active={isActive(pathname, section)}
+                />
+              ))}
+            </HStack>
           </HStack>
           <HStack gap={1}>
             <ViewOptionsMenu />
@@ -154,7 +148,7 @@ export function SubNav({ links }: { links: NavLink[] }) {
       top="14"
       zIndex="docked"
       borderBottomWidth="1px"
-
+      borderColor={accent ?? "border"}
       bg="bg.panel"
     >
       <Container maxW="6xl">
