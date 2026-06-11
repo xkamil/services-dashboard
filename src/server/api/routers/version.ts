@@ -1,5 +1,6 @@
 import { serviceVersionSchema } from "~/lib/validation/version";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter } from "~/server/api/trpc/init";
+import { protectedProcedure } from "~/server/api/trpc/procedures";
 
 interface ServiceVersion {
   version?: string;

@@ -2,7 +2,7 @@ import { adminRouter } from "~/server/api/routers/admin";
 import { authRouter } from "~/server/api/routers/auth";
 import { secretsRouter } from "~/server/api/routers/secrets";
 import { versionRouter } from "~/server/api/routers/version";
-import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc/init";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,

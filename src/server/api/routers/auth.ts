@@ -6,11 +6,11 @@ import {
   loginSchema,
   registerServerSchema,
 } from "~/lib/validation/auth";
+import { createTRPCRouter } from "~/server/api/trpc/init";
 import {
-  createTRPCRouter,
   protectedProcedure,
   publicProcedure,
-} from "~/server/api/trpc";
+} from "~/server/api/trpc/procedures";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure

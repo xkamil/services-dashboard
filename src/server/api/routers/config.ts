@@ -16,11 +16,11 @@ import {
   getCurrentConfigVersion,
   revertToVersion,
 } from "~/server/config";
+import { createTRPCRouter } from "~/server/api/trpc/init";
 import {
   adminProcedure,
-  createTRPCRouter,
   protectedProcedure,
-} from "~/server/api/trpc";
+} from "~/server/api/trpc/procedures";
 
 export const configRouter = createTRPCRouter({
   /** The active config document, for the editor and any consumer. */

@@ -3,7 +3,8 @@ import {
   removeSecretSchema,
   setSecretSchema,
 } from "~/lib/validation/secrets";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter } from "~/server/api/trpc/init";
+import { protectedProcedure } from "~/server/api/trpc/procedures";
 import { encryptSecret } from "~/server/secrets/crypto";
 
 export const secretsRouter = createTRPCRouter({
