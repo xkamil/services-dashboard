@@ -8,7 +8,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { Moon, Settings, Settings2, Sun } from "lucide-react";
+import { Moon, Settings2, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -38,7 +38,12 @@ function ViewToggleItem({
           {icon}
           <Text>{label}</Text>
         </HStack>
-        <Switch.Root size="sm" checked={checked} pointerEvents="none" aria-hidden>
+        <Switch.Root
+          size="sm"
+          checked={checked}
+          pointerEvents="none"
+          aria-hidden
+        >
           <Switch.HiddenInput tabIndex={-1} />
           <Switch.Control />
         </Switch.Root>
