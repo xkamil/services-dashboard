@@ -76,7 +76,7 @@ function Brand() {
       display="inline-flex"
       alignItems="center"
       gap={2}
-      color="fg"
+      color="#0084FF"
       fontWeight="semibold"
       _hover={{ textDecoration: "none" }}
       _focusVisible={{ outline: "none" }}
