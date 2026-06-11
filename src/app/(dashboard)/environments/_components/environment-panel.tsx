@@ -175,7 +175,6 @@ export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
               size="md"
               flex="none"
               ms="auto"
-              variant="ghost"
               loading={anyVersionFetching}
               onRefresh={() => void utils.version.getForService.invalidate()}
             />
