@@ -3,6 +3,7 @@
 import { HStack, NativeSelect, Stack, Text, Wrap } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
+import { ClearFiltersButton } from "~/app/_components/clear-filters-button";
 import { IconLink } from "~/app/_components/icon-link";
 import { RefreshButton } from "~/app/_components/refresh-button";
 import { SearchInput } from "~/app/_components/search-input";
@@ -99,6 +100,18 @@ export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
       .sort((a, b) => a.owner.localeCompare(b.owner));
   }, [env.services]);
 
+  // Count of filters that currently narrow the list, for the clear-all badge.
+  const activeFilterCount =
+    (nameFilter.trim() === "" ? 0 : 1) +
+    (ownerFilter === "" ? 0 : 1) +
+    (versionFilter === "" ? 0 : 1);
+
+  const clearAllFilters = () => {
+    setNameFilter("");
+    setOwnerFilter("");
+    setVersionFilter("");
+  };
+
   const filteredServices = useMemo(() => {
     const query = nameFilter.trim().toLowerCase();
     return env.services.filter(
@@ -152,11 +165,17 @@ export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
                 onChange={setVersionFilter}
                 counts={versionCounts}
               />
+              <ClearFiltersButton
+                size="md"
+                activeFilterCount={activeFilterCount}
+                onClear={clearAllFilters}
+              />
             </HStack>
             <RefreshButton
               size="md"
               flex="none"
               ms="auto"
+              variant="ghost"
               loading={anyVersionFetching}
               onRefresh={() => void utils.version.getForService.invalidate()}
             />
