@@ -9,6 +9,7 @@
 import type {
   AppConfig,
   EnvironmentBase,
+  EnvironmentType,
   ServiceBase,
 } from "~/lib/config/schema";
 
@@ -39,6 +40,8 @@ export function environmentSlug(name: string): string {
 /** An environment after inheritance + placeholder substitution. */
 export type ResolvedEnvironment = {
   name: string;
+  /** Deployment stage (TEST / STAGE / PROD); drives the env's accent colour. */
+  type: EnvironmentType;
   variables: Record<string, string>;
   links: Record<string, string>;
   services: ResolvedService[];
@@ -169,6 +172,7 @@ export function resolveEnvironment(
 
   return {
     name: env.name,
+    type: env.type,
     variables: base.variables,
     links: resolveLinks(base.links, context, unresolved),
     services,

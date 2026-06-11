@@ -82,9 +82,19 @@ export const environmentServiceSchema = z.object({
   links: serviceLinksSchema.default({}),
 });
 
+/**
+ * The deployment stage an environment represents. Required per environment and
+ * drives its accent colour (see `ENVIRONMENT_TYPE_META`).
+ */
+export const ENVIRONMENT_TYPES = ["TEST", "STAGE", "PROD"] as const;
+export const environmentTypeSchema = z.enum(ENVIRONMENT_TYPES);
+export type EnvironmentType = z.infer<typeof environmentTypeSchema>;
+
 /** A concrete environment. Identified by `name`; inherits the env defaults. */
 export const environmentSchema = z.object({
   name: z.string().min(1),
+  /** Deployment stage; required (TEST / STAGE / PROD). */
+  type: environmentTypeSchema,
   variables: z.record(z.string()).default({}),
   links: environmentLinksSchema.default({}),
   /** Per-environment service overrides (every service is added by default). */

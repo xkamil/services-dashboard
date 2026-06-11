@@ -18,6 +18,7 @@
   "environments": [
     {
       "name": "dev",
+      "type": "TEST",
       "variables": {
         "baseDomain": "dev.example.com"
       },
@@ -26,6 +27,7 @@
     },
     {
       "name": "test",
+      "type": "TEST",
       "variables": {
         "baseDomain": "test.example.com"
       },
@@ -34,6 +36,7 @@
     },
     {
       "name": "stage",
+      "type": "STAGE",
       "variables": {
         "baseDomain": "stage.example.com"
       },
@@ -42,6 +45,7 @@
     },
     {
       "name": "production",
+      "type": "PROD",
       "variables": {
         "baseDomain": "example.com"
       },

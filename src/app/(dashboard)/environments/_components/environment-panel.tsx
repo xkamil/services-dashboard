@@ -10,7 +10,6 @@ import { SearchInput } from "~/app/_components/search-input";
 import type { ResolvedEnvironment } from "~/lib/config/resolve";
 import { type Comparison, compareVersions } from "~/lib/version";
 import { api } from "~/trpc/react";
-
 import { ServiceCard } from "./service-card";
 import { VersionFilter, type VersionFilterValue } from "./version-filter";
 

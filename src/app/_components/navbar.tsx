@@ -5,6 +5,7 @@ import { LayoutGrid } from "lucide-react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 
+import type { ColorToken } from "~/lib/config/environment-type";
 import { hasMinRole, type Role } from "~/lib/roles";
 import { api } from "~/trpc/react";
 
@@ -23,6 +24,11 @@ export type NavLink = {
    * while still highlighting for the whole section.
    */
   match?: string;
+  /**
+   * Explicit colour used to tint the tab (label + bottom border) while it is
+   * active. Inactive tabs are unaffected.
+   */
+  accentColor?: ColorToken;
 };
 
 export const SECTIONS: NavLink[] = [
@@ -47,45 +53,30 @@ function isActive(pathname: string, link: NavLink) {
  * Visual styling shared by every underline tab — the main section tabs and the
  * sub-nav tabs. Keeps them identical.
  */
-const navTabStyles = (active: boolean) =>
-  ({
-    color: active ? "fg" : "fg.muted",
+const navTabStyles = (active: boolean, accentColor?: ColorToken) => {
+  // When a tab is active and carries an accent colour, tint its label and bottom
+  // border with that exact colour (so the two match); otherwise fall back to the
+  // neutral `fg`. The shade itself is owned by the caller (e.g. the env type).
+  const accent = accentColor ?? "fg";
+  return {
+    color: active ? accent : "fg.muted",
     fontWeight: active ? "semibold" : "normal",
     borderBottomWidth: "2px",
-    borderColor: active ? "fg" : "transparent",
+    borderColor: active ? accent : "transparent",
     h: "full",
     display: "inline-flex",
     alignItems: "center",
     rounded: "none",
     outline: "none",
-    _hover: { color: "fg", textDecoration: "none" },
-    _focusVisible: { outline: "none", color: "fg", borderColor: "fg" },
-  }) as const;
+    _hover: { color: accent, textDecoration: "none" },
+    _focusVisible: { outline: "none", color: accent, borderColor: accent },
+  } as const;
+};
 
 function NavTab({ link, active }: { link: NavLink; active: boolean }) {
   return (
-    <Link asChild {...navTabStyles(active)}>
+    <Link asChild {...navTabStyles(active, link.accentColor)}>
       <NextLink href={link.href}>{link.label}</NextLink>
-    </Link>
-  );
-}
-
-function Brand() {
-  return (
-    <Link
-      asChild
-      display="inline-flex"
-      alignItems="center"
-      gap={2}
-      color="#0084FF"
-      fontWeight="semibold"
-      _hover={{ textDecoration: "none" }}
-      _focusVisible={{ outline: "none" }}
-    >
-      <NextLink href="/">
-        <LayoutGrid size={20} aria-hidden />
-        <Text fontSize="md">Services Dashboard</Text>
-      </NextLink>
     </Link>
   );
 }
@@ -105,7 +96,7 @@ export function Navbar({ sections }: { sections: NavLink[] }) {
   // dashboard, so the section tabs are redundant and hidden for them.
   const isAdmin = !!session && hasMinRole(session.role, "ADMIN");
 
-  const visibleSections = isAdmin ? sections.filter(canSee) : [];
+  const visibleSections = sections.filter(canSee);
 
   return (
     <Box
@@ -120,9 +111,6 @@ export function Navbar({ sections }: { sections: NavLink[] }) {
       <Container maxW="6xl">
         <Flex h="14" align="center" justify="space-between">
           <HStack gap={6} h="full">
-            <Brand />
-
-            {visibleSections.length > 0 && (
               <HStack gap={6} h="full" fontSize="sm">
                 {visibleSections.map((section) => (
                   <NavTab
@@ -132,7 +120,6 @@ export function Navbar({ sections }: { sections: NavLink[] }) {
                   />
                 ))}
               </HStack>
-            )}
           </HStack>
           <HStack gap={1}>
             <ViewOptionsMenu />
@@ -156,6 +143,10 @@ export function SubNav({ links }: { links: NavLink[] }) {
   const visibleLinks = links.filter(canSee);
   if (visibleLinks.length === 0) return null;
 
+  // Colour the bar's bottom border with the active link's accent colour (e.g.
+  // the selected environment's stage colour); neutral border when none.
+  const accent = visibleLinks.find((l) => isActive(pathname, l))?.accentColor;
+
   return (
     <Box
       as="nav"
@@ -163,7 +154,7 @@ export function SubNav({ links }: { links: NavLink[] }) {
       top="14"
       zIndex="docked"
       borderBottomWidth="1px"
-      borderColor="border"
+
       bg="bg.panel"
     >
       <Container maxW="6xl">
