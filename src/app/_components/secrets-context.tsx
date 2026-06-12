@@ -14,7 +14,7 @@ import { api } from "~/trpc/react";
 
 import { SecretsDialog } from "./secrets-dialog";
 
-type SecretStatus = {
+export type SecretStatus = {
   key: SecretKey;
   label: string;
   description: string;
