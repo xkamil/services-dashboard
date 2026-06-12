@@ -1,6 +1,13 @@
 "use client";
 
-import { Button, Stack, Table, Text } from "@chakra-ui/react";
+import { Button, Stack, Text } from "@chakra-ui/react";
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 
 import { DataTable } from "~/app/_components/data-table";
@@ -8,11 +15,15 @@ import { AppDialog } from "~/app/_components/dialog-utils";
 import { SkeletonRows } from "~/app/_components/skeleton-rows";
 import { formatDateTime } from "~/lib/format";
 import { MAX_AUDIT_RANGE_DAYS } from "~/lib/validation/admin";
-import { api } from "~/trpc/react";
+import { api, type RouterOutputs } from "~/trpc/react";
 
 import { DAY_MS, endOfDay, startOfDay, toDateInput } from "./audit-dates";
 import { AuditDetailsCell, formatDetails } from "./audit-log-details";
 import { AuditLogFilters } from "./audit-log-filters";
+
+type AuditRow = RouterOutputs["admin"]["audit"]["list"][number];
+
+const columnHelper = createColumnHelper<AuditRow>();
 
 export function AuditLogTable() {
   const today = toDateInput(new Date());
@@ -35,12 +46,54 @@ export function AuditLogTable() {
     to: endOfDay(to),
   });
 
-  const rows = useMemo(() => {
-    if (!logs) return [];
-    const filterLower = filter.trim().toLowerCase();
-    if (!filterLower) return logs;
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("createdAt", {
+        header: "When",
+        sortingFn: "datetime",
+        cell: ({ getValue }) => formatDateTime(getValue()),
+        meta: { cellProps: { whiteSpace: "nowrap" } },
+      }),
+      columnHelper.accessor((log) => log.userEmail ?? "", {
+        id: "userEmail",
+        header: "User",
+        cell: ({ row }) => row.original.userEmail ?? "—",
+      }),
+      columnHelper.accessor("action", { header: "Action" }),
+      columnHelper.display({
+        id: "details",
+        header: "Details",
+        meta: {
+          cellProps: {
+            color: "fg.muted",
+            fontSize: "xs",
+            fontFamily: "mono",
+            wordBreak: "break-all",
+          },
+        },
+        cell: ({ row }) => (
+          <AuditDetailsCell
+            input={row.original.input}
+            onShowMore={setSelectedDetails}
+          />
+        ),
+      }),
+    ],
+    [],
+  );
 
-    return logs.filter((log) => {
+  const data = useMemo(() => logs ?? [], [logs]);
+
+  const table = useReactTable({
+    data,
+    columns,
+    getRowId: (log) => log.id,
+    state: { globalFilter: filter },
+    onGlobalFilterChange: setFilter,
+    globalFilterFn: (row, _columnId, value: string) => {
+      const filterLower = value.trim().toLowerCase();
+      if (!filterLower) return true;
+      const log = row.original;
       const haystack = [
         log.action,
         log.userEmail ?? "",
@@ -50,8 +103,11 @@ export function AuditLogTable() {
         .join(" ")
         .toLowerCase();
       return haystack.includes(filterLower);
-    });
-  }, [logs, filter]);
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
 
   return (
     <Stack gap={4}>
@@ -72,39 +128,9 @@ export function AuditLogTable() {
         <SkeletonRows />
       ) : (
         <DataTable
-          columnCount={4}
-          isEmpty={rows.length === 0}
+          table={table}
           emptyMessage="No changes recorded for this range."
-          header={
-            <>
-              <Table.ColumnHeader>When</Table.ColumnHeader>
-              <Table.ColumnHeader>User</Table.ColumnHeader>
-              <Table.ColumnHeader>Action</Table.ColumnHeader>
-              <Table.ColumnHeader>Details</Table.ColumnHeader>
-            </>
-          }
-        >
-          {rows.map((log) => (
-            <Table.Row key={log.id}>
-              <Table.Cell whiteSpace="nowrap">
-                {formatDateTime(log.createdAt)}
-              </Table.Cell>
-              <Table.Cell>{log.userEmail ?? "—"}</Table.Cell>
-              <Table.Cell>{log.action}</Table.Cell>
-              <Table.Cell
-                color="fg.muted"
-                fontSize="xs"
-                fontFamily="mono"
-                wordBreak="break-all"
-              >
-                <AuditDetailsCell
-                  input={log.input}
-                  onShowMore={setSelectedDetails}
-                />
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </DataTable>
+        />
       )}
 
       <AppDialog
