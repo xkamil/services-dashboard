@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Field, NativeSelect, Stack, Text } from "@chakra-ui/react";
+import { Field, NativeSelect, Stack, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 import { ROLE_META, type Role } from "~/lib/roles";
@@ -8,7 +8,11 @@ import { showErrorToast, showSuccessToast } from "~/lib/toast";
 import { roleSchema } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
-import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
+import {
+  AppDialog,
+  DialogActions,
+  useLastValue,
+} from "~/app/_components/dialog-utils";
 
 type EditingUser = { id: string; email: string; role: Role };
 
@@ -58,23 +62,17 @@ export function ChangeRoleDialog({ user, onClose }: Props) {
       onClose={onClose}
       title="Change user role"
       footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorPalette="blue"
-            loading={updateRole.isPending}
-            disabled={isUnchanged}
-            onClick={() => {
-              if (displayUser) {
-                updateRole.mutate({ userId: displayUser.id, role });
-              }
-            }}
-          >
-            Confirm
-          </Button>
-        </>
+        <DialogActions
+          onCancel={onClose}
+          confirmLabel="Confirm"
+          loading={updateRole.isPending}
+          disabled={isUnchanged}
+          onConfirm={() => {
+            if (displayUser) {
+              updateRole.mutate({ userId: displayUser.id, role });
+            }
+          }}
+        />
       }
     >
       {displayUser && (
