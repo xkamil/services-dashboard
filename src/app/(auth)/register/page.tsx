@@ -42,13 +42,11 @@ export default function RegisterPage() {
       setSuccessMsg("Account created. You can now sign in.");
     },
     onError: (error) => {
-      if (error.message === "EMAIL_TAKEN") {
+      if (error.data?.code === "BAD_REQUEST") {
+        // The server never says whether the email is taken (anti-enumeration),
+        // so this covers both validation failures and existing accounts.
         setErrorMsg(
-          "An account with this email already exists. Try signing in instead.",
-        );
-      } else if (error.data?.code === "BAD_REQUEST") {
-        setErrorMsg(
-          "Please check your details — some fields didn't pass validation.",
+          "We couldn't create your account. Please check your details or use a different email address.",
         );
       } else {
         setErrorMsg(
