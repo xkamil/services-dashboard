@@ -30,7 +30,7 @@ UX verdict: the UI is consistent and close to stock Chakra — no "customization
 
 ### Phase 1 — Quick wins (tooling & hygiene)
 
-- [ ] **Remove the Tailwind stack**
+- [x] **Remove the Tailwind stack**
   - Uninstall `tailwindcss`, `@tailwindcss/postcss`, `prettier-plugin-tailwindcss`.
   - Delete `postcss.config.js` Tailwind plugin entry (drop the file if empty) and the plugin from `prettier.config.js`.
   - Replace `src/styles/globals.css`: drop `@import "tailwindcss"` and the `@theme` block; move the Geist font into the Chakra system config in `src/app/provider.tsx` (`theme.tokens.fonts.body/heading` → `var(--font-geist-sans)`).
