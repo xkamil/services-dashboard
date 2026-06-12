@@ -44,8 +44,8 @@ UX verdict: the UI is consistent and close to stock Chakra — no "customization
 - [x] **`use-table-sort.ts` + `sortable-header.tsx`** — extract the sort state (`sortField`/`sortDir`/`toggleSort`), comparator, `SortIcon`, and `sortableHeader` render helper from `users-table.tsx`. (Correction: `audit-log-table.tsx` has no sorting, so this applies to the users table only; the hook is ready for reuse.)
 - [x] **`data-table.tsx`** — shared shell: bordered/rounded `Box` + `Table.Root variant="line"` + empty-state row with `colSpan` + `fg.muted` message. Tables pass headers, rows, and `emptyMessage`.
 - [x] **Extend `dialog-utils.tsx` with `DialogActions`** — `<DialogActions onCancel confirmLabel confirmPalette loading disabled onConfirm />` replacing the Cancel/Confirm footer pair in `change-role-dialog.tsx`, `delete-user-dialog.tsx`, `reset-password-dialog.tsx`, and config-history's `RevertDialog`. (Correction: `secrets-dialog.tsx` and `config-diff-dialog.tsx` have single Close-button footers, not this pattern.)
-- [ ] **`use-toast-mutation.ts`** — small wrapper around `useMutation` taking `{ invalidate, onDone, successTitle, successDescription, errorTitle, errorDescription }` and applying the shared `showSuccessToast`/`showErrorToast` + invalidate + close pattern; adopt in the ~6 dialogs/components that repeat it (26 toast call sites across 8 components today).
-- [ ] **Set `role="alertdialog"`** on the destructive `DeleteUserDialog` (prop already exists on `AppDialog`).
+- [x] **`use-toast-mutation.ts`** — implemented as `toastMutationOptions()` in `src/lib/toast.ts` (an options-builder composes better with tRPC's typed `useMutation` than a wrapper hook); adopted by all 7 mutations that repeated the pattern (change-role, delete-user, reset-password, revert, config save, secret set/remove).
+- [x] **Set `role="alertdialog"`** on the destructive `DeleteUserDialog` — already present at review time (`delete-user-dialog.tsx`); no change needed.
 
 ### Phase 3 — Split oversized components (no behavior change)
 

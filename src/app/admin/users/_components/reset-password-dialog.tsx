@@ -2,7 +2,7 @@
 
 import { Button, Clipboard, Code, HStack, Stack, Text } from "@chakra-ui/react";
 
-import { showErrorToast, showSuccessToast } from "~/lib/toast";
+import { toastMutationOptions } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
 import {
@@ -21,22 +21,17 @@ type Props = {
 export function ResetPasswordDialog({ user, onClose }: Props) {
   const displayUser = useLastValue(user);
 
-  const resetPassword = api.admin.users.resetPassword.useMutation({
-    onSuccess: () => {
-      const email = displayUser?.email;
-      showSuccessToast("Password reset", {
-        description: email
-          ? `A temporary password was generated for ${email}.`
+  const resetPassword = api.admin.users.resetPassword.useMutation(
+    toastMutationOptions({
+      successTitle: "Password reset",
+      successDescription: () =>
+        displayUser?.email
+          ? `A temporary password was generated for ${displayUser.email}.`
           : undefined,
-      });
-    },
-    onError: (error) => {
-      showErrorToast("Could not reset password", {
-        description: "Failed to reset the password. Please try again.",
-        details: error.message,
-      });
-    },
-  });
+      errorTitle: "Could not reset password",
+      errorDescription: "Failed to reset the password. Please try again.",
+    }),
+  );
   const generatedPassword = resetPassword.data?.password;
 
   const handleClose = () => {

@@ -14,7 +14,7 @@ import { useState } from "react";
 
 import { type SecretKey } from "~/lib/secrets";
 import { setSecretSchema } from "~/lib/validation/secrets";
-import { showErrorToast, showSuccessToast } from "~/lib/toast";
+import { toastMutationOptions } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
 import { AppDialog } from "./dialog-utils";
@@ -51,37 +51,33 @@ export function SecretsDialog({ open, onClose }: Props) {
     setErrors({});
   };
 
-  const setSecret = api.secrets.set.useMutation({
-    onSuccess: async (_data, variables) => {
-      await utils.secrets.list.invalidate();
-      clearDraft(variables.key);
-      showSuccessToast("Secret saved", {
-        description: `${variables.key} has been stored securely.`,
-      });
-    },
-    onError: (err) => {
-      showErrorToast("Could not save secret", {
-        description: "Failed to store the secret. Please try again.",
-        details: err.message,
-      });
-    },
-  });
+  const setSecret = api.secrets.set.useMutation(
+    toastMutationOptions({
+      successTitle: "Secret saved",
+      successDescription: (_data, variables: { key: SecretKey }) =>
+        `${variables.key} has been stored securely.`,
+      errorTitle: "Could not save secret",
+      errorDescription: "Failed to store the secret. Please try again.",
+      onDone: async (_data, variables) => {
+        await utils.secrets.list.invalidate();
+        clearDraft(variables.key);
+      },
+    }),
+  );
 
-  const removeSecret = api.secrets.remove.useMutation({
-    onSuccess: async (_data, variables) => {
-      await utils.secrets.list.invalidate();
-      clearDraft(variables.key);
-      showSuccessToast("Secret removed", {
-        description: `${variables.key} has been deleted.`,
-      });
-    },
-    onError: (err) => {
-      showErrorToast("Could not remove secret", {
-        description: "Failed to delete the secret. Please try again.",
-        details: err.message,
-      });
-    },
-  });
+  const removeSecret = api.secrets.remove.useMutation(
+    toastMutationOptions({
+      successTitle: "Secret removed",
+      successDescription: (_data, variables: { key: SecretKey }) =>
+        `${variables.key} has been deleted.`,
+      errorTitle: "Could not remove secret",
+      errorDescription: "Failed to delete the secret. Please try again.",
+      onDone: async (_data, variables) => {
+        await utils.secrets.list.invalidate();
+        clearDraft(variables.key);
+      },
+    }),
+  );
 
   const isBusy = setSecret.isPending || removeSecret.isPending;
 

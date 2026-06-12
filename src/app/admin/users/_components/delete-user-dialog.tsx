@@ -2,7 +2,7 @@
 
 import { Text } from "@chakra-ui/react";
 
-import { showErrorToast, showSuccessToast } from "~/lib/toast";
+import { toastMutationOptions } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
 import {
@@ -22,26 +22,22 @@ export function DeleteUserDialog({ user, onClose }: Props) {
   const displayUser = useLastValue(user);
 
   const utils = api.useUtils();
-  const deleteUser = api.admin.users.delete.useMutation({
-    onSuccess: async () => {
-      await utils.admin.users.list.invalidate();
-      const email = displayUser?.email;
-      onClose();
-      showSuccessToast("User deleted", {
-        description: email ? `${email} has been removed.` : undefined,
-      });
-    },
-    onError: (error) => {
-      const description =
+  const deleteUser = api.admin.users.delete.useMutation(
+    toastMutationOptions({
+      successTitle: "User deleted",
+      successDescription: () =>
+        displayUser?.email ? `${displayUser.email} has been removed.` : undefined,
+      errorTitle: "Could not delete user",
+      errorDescription: (error) =>
         error.message === "CANNOT_DELETE_SELF"
           ? "You cannot delete your own account."
-          : "Failed to delete user. Please try again.";
-      showErrorToast("Could not delete user", {
-        description,
-        details: error.message,
-      });
-    },
-  });
+          : "Failed to delete user. Please try again.",
+      onDone: async () => {
+        await utils.admin.users.list.invalidate();
+        onClose();
+      },
+    }),
+  );
 
   return (
     <AppDialog
