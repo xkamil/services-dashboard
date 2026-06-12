@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   HStack,
-  Skeleton,
   Stack,
   Table,
   Text,
@@ -12,6 +11,7 @@ import {
 import { useState } from "react";
 
 import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
+import { SkeletonRows } from "~/app/_components/skeleton-rows";
 import { formatDateTime } from "~/lib/format";
 import { showErrorToast, showSuccessToast } from "~/lib/toast";
 import { api } from "~/trpc/react";
@@ -98,11 +98,7 @@ export function ConfigHistory() {
       </Text>
 
       {isLoading ? (
-        <Stack gap={2}>
-          {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} h="10" />
-          ))}
-        </Stack>
+        <SkeletonRows />
       ) : (
         <Box borderWidth="1px" borderColor="border" rounded="md" overflowX="auto">
           <Table.Root variant="line">
