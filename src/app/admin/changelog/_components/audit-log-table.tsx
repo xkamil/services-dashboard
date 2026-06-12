@@ -1,72 +1,18 @@
 "use client";
 
-import {
-  Button,
-  Field,
-  HStack,
-  Input,
-  Link,
-  Stack,
-  Table,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Stack, Table, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
 import { DataTable } from "~/app/_components/data-table";
 import { AppDialog } from "~/app/_components/dialog-utils";
-import { RefreshButton } from "~/app/_components/refresh-button";
-import { SearchInput } from "~/app/_components/search-input";
 import { SkeletonRows } from "~/app/_components/skeleton-rows";
 import { formatDateTime } from "~/lib/format";
 import { MAX_AUDIT_RANGE_DAYS } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-const MAX_DETAILS_LENGTH = 200;
-
-function toDateInput(date: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
-function clampDateInput(value: string, min: string, max: string) {
-  if (value < min) return min;
-  if (value > max) return max;
-  return value;
-}
-
-function startOfDay(value: string) {
-  const [y, m, d] = value.split("-").map(Number) as [number, number, number];
-  return new Date(y, m - 1, d, 0, 0, 0, 0);
-}
-
-function endOfDay(value: string) {
-  const [y, m, d] = value.split("-").map(Number) as [number, number, number];
-  return new Date(y, m - 1, d, 23, 59, 59, 999);
-}
-
-function formatDetails(input: string | null): string {
-  if (!input) return "—";
-  try {
-    const parsed: unknown = JSON.parse(input);
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-      const entries = Object.entries(parsed as Record<string, unknown>);
-      if (entries.length === 0) return "—";
-      return entries
-        .map(([key, value]) => {
-          const rendered =
-            value && typeof value === "object"
-              ? JSON.stringify(value)
-              : String(value);
-          return `${key}: ${rendered}`;
-        })
-        .join(", ");
-    }
-    return JSON.stringify(parsed);
-  } catch {
-    return input;
-  }
-}
+import { DAY_MS, endOfDay, startOfDay, toDateInput } from "./audit-dates";
+import { AuditDetailsCell, formatDetails } from "./audit-log-details";
+import { AuditLogFilters } from "./audit-log-filters";
 
 export function AuditLogTable() {
   const today = toDateInput(new Date());
@@ -78,11 +24,6 @@ export function AuditLogTable() {
   const [to, setTo] = useState(today);
   const [filter, setFilter] = useState("");
   const [selectedDetails, setSelectedDetails] = useState<string | null>(null);
-
-  // Bounds that keep the selected window within MAX_AUDIT_RANGE_DAYS.
-  const fromMin = toDateInput(
-    new Date(endOfDay(to).getTime() - MAX_AUDIT_RANGE_DAYS * DAY_MS),
-  );
 
   const {
     data: logs,
@@ -112,54 +53,20 @@ export function AuditLogTable() {
     });
   }, [logs, filter]);
 
-  const handleFromChange = (value: string) => {
-    setFrom(clampDateInput(value, fromMin, to));
-  };
-
-  const handleToChange = (value: string) => {
-    const nextTo = clampDateInput(value, from, today);
-    setTo(nextTo);
-    // Keep the window within range if `to` moved far from `from`.
-    const nextFromMin = toDateInput(
-      new Date(endOfDay(nextTo).getTime() - MAX_AUDIT_RANGE_DAYS * DAY_MS),
-    );
-    if (from < nextFromMin) setFrom(nextFromMin);
-    if (from > nextTo) setFrom(nextTo);
-  };
-
   return (
     <Stack gap={4}>
-      <HStack gap={4} align="end" wrap="wrap">
-        <Field.Root maxW="3xs">
-          <Field.Label>From</Field.Label>
-          <Input
-            type="date"
-            value={from}
-            min={fromMin}
-            max={to}
-            onChange={(e) => handleFromChange(e.target.value)}
-          />
-        </Field.Root>
-        <Field.Root maxW="3xs">
-          <Field.Label>To</Field.Label>
-          <Input
-            type="date"
-            value={to}
-            min={from}
-            max={today}
-            onChange={(e) => handleToChange(e.target.value)}
-          />
-        </Field.Root>
-        <Field.Root flex="1" minW="3xs">
-          <Field.Label>Search</Field.Label>
-          <SearchInput
-            placeholder="Filter by action, user, or details…"
-            value={filter}
-            onChange={setFilter}
-          />
-        </Field.Root>
-        <RefreshButton loading={isFetching} onRefresh={() => void refetch()} />
-      </HStack>
+      <AuditLogFilters
+        from={from}
+        to={to}
+        onRangeChange={(range) => {
+          setFrom(range.from);
+          setTo(range.to);
+        }}
+        filter={filter}
+        onFilterChange={setFilter}
+        isFetching={isFetching}
+        onRefresh={() => void refetch()}
+      />
 
       {isLoading ? (
         <SkeletonRows />
@@ -190,26 +97,10 @@ export function AuditLogTable() {
                 fontFamily="mono"
                 wordBreak="break-all"
               >
-                {(() => {
-                  const details = formatDetails(log.input);
-                  if (details.length <= MAX_DETAILS_LENGTH) {
-                    return details;
-                  }
-                  return (
-                    <>
-                      {details.slice(0, MAX_DETAILS_LENGTH)}…{" "}
-                      <Link
-                        as="button"
-                        type="button"
-                        color="fg.info"
-                        fontFamily="body"
-                        onClick={() => setSelectedDetails(details)}
-                      >
-                        more
-                      </Link>
-                    </>
-                  );
-                })()}
+                <AuditDetailsCell
+                  input={log.input}
+                  onShowMore={setSelectedDetails}
+                />
               </Table.Cell>
             </Table.Row>
           ))}
