@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Box,
   Button,
   Field,
   HStack,
@@ -13,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
+import { DataTable } from "~/app/_components/data-table";
 import { AppDialog } from "~/app/_components/dialog-utils";
 import { RefreshButton } from "~/app/_components/refresh-button";
 import { SearchInput } from "~/app/_components/search-input";
@@ -164,71 +164,56 @@ export function AuditLogTable() {
       {isLoading ? (
         <SkeletonRows />
       ) : (
-        <Box
-          borderWidth="1px"
-          borderColor="border"
-          rounded="md"
-          overflowX="auto"
+        <DataTable
+          columnCount={4}
+          isEmpty={rows.length === 0}
+          emptyMessage="No changes recorded for this range."
+          header={
+            <>
+              <Table.ColumnHeader>When</Table.ColumnHeader>
+              <Table.ColumnHeader>User</Table.ColumnHeader>
+              <Table.ColumnHeader>Action</Table.ColumnHeader>
+              <Table.ColumnHeader>Details</Table.ColumnHeader>
+            </>
+          }
         >
-          <Table.Root variant="line">
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeader>When</Table.ColumnHeader>
-                <Table.ColumnHeader>User</Table.ColumnHeader>
-                <Table.ColumnHeader>Action</Table.ColumnHeader>
-                <Table.ColumnHeader>Details</Table.ColumnHeader>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {rows.length === 0 ? (
-                <Table.Row>
-                  <Table.Cell colSpan={4}>
-                    <Text textAlign="center" color="fg.muted" py={4}>
-                      No changes recorded for this range.
-                    </Text>
-                  </Table.Cell>
-                </Table.Row>
-              ) : (
-                rows.map((log) => (
-                  <Table.Row key={log.id}>
-                    <Table.Cell whiteSpace="nowrap">
-                      {formatDateTime(log.createdAt)}
-                    </Table.Cell>
-                    <Table.Cell>{log.userEmail ?? "—"}</Table.Cell>
-                    <Table.Cell>{log.action}</Table.Cell>
-                    <Table.Cell
-                      color="fg.muted"
-                      fontSize="xs"
-                      fontFamily="mono"
-                      wordBreak="break-all"
-                    >
-                      {(() => {
-                        const details = formatDetails(log.input);
-                        if (details.length <= MAX_DETAILS_LENGTH) {
-                          return details;
-                        }
-                        return (
-                          <>
-                            {details.slice(0, MAX_DETAILS_LENGTH)}…{" "}
-                            <Link
-                              as="button"
-                              type="button"
-                              color="fg.info"
-                              fontFamily="body"
-                              onClick={() => setSelectedDetails(details)}
-                            >
-                              more
-                            </Link>
-                          </>
-                        );
-                      })()}
-                    </Table.Cell>
-                  </Table.Row>
-                ))
-              )}
-            </Table.Body>
-          </Table.Root>
-        </Box>
+          {rows.map((log) => (
+            <Table.Row key={log.id}>
+              <Table.Cell whiteSpace="nowrap">
+                {formatDateTime(log.createdAt)}
+              </Table.Cell>
+              <Table.Cell>{log.userEmail ?? "—"}</Table.Cell>
+              <Table.Cell>{log.action}</Table.Cell>
+              <Table.Cell
+                color="fg.muted"
+                fontSize="xs"
+                fontFamily="mono"
+                wordBreak="break-all"
+              >
+                {(() => {
+                  const details = formatDetails(log.input);
+                  if (details.length <= MAX_DETAILS_LENGTH) {
+                    return details;
+                  }
+                  return (
+                    <>
+                      {details.slice(0, MAX_DETAILS_LENGTH)}…{" "}
+                      <Link
+                        as="button"
+                        type="button"
+                        color="fg.info"
+                        fontFamily="body"
+                        onClick={() => setSelectedDetails(details)}
+                      >
+                        more
+                      </Link>
+                    </>
+                  );
+                })()}
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </DataTable>
       )}
 
       <AppDialog
