@@ -1,18 +1,17 @@
 "use client";
 
 import {
-  Box,
   HStack,
   IconButton,
   Menu,
   Portal,
   Stack,
   Table,
-  Text,
 } from "@chakra-ui/react";
 import { MoreVertical } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { DataTable } from "~/app/_components/data-table";
 import { RefreshButton } from "~/app/_components/refresh-button";
 import { RoleBadge } from "~/app/_components/role-badge";
 import { SearchInput } from "~/app/_components/search-input";
@@ -94,117 +93,91 @@ export function UsersTable() {
       {isLoading ? (
         <SkeletonRows />
       ) : (
-        <Box
-          borderWidth="1px"
-          borderColor="border"
-          rounded="md"
-          overflowX="auto"
-        >
-          <Table.Root variant="line">
-            <Table.Header>
-              <Table.Row>
-                {sortableHeader("id", "User ID")}
-                {sortableHeader("email", "Email")}
-                {sortableHeader("role", "Role")}
-                {sortableHeader("createdAt", "Created")}
-                {sortableHeader("updatedAt", "Updated")}
-                {canManage && (
-                  <Table.ColumnHeader textAlign="end">
-                    Actions
-                  </Table.ColumnHeader>
-                )}
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {rows.length === 0 ? (
-                <Table.Row>
-                  <Table.Cell colSpan={canManage ? 6 : 5}>
-                    <Text textAlign="center" color="fg.muted" py={4}>
-                      No users match the filter.
-                    </Text>
-                  </Table.Cell>
-                </Table.Row>
-              ) : (
-                rows.map((user) => {
-                  return (
-                    <Table.Row key={user.id}>
-                      <Table.Cell
-                        fontFamily="mono"
-                        fontSize="xs"
-                        color="fg.muted"
-                      >
-                        {user.id}
-                      </Table.Cell>
-                      <Table.Cell>{user.email}</Table.Cell>
-                      <Table.Cell>
-                        <RoleBadge role={user.role} />
-                      </Table.Cell>
-                      <Table.Cell>{formatDateTime(user.createdAt)}</Table.Cell>
-                      <Table.Cell>{formatDateTime(user.updatedAt)}</Table.Cell>
-                      {canManage && (
-                        <Table.Cell textAlign="end">
-                          <Menu.Root>
-                            <Menu.Trigger asChild>
-                              <IconButton
-                                variant="ghost"
-                                aria-label="User actions"
-                              >
-                                <MoreVertical size={16} aria-hidden />
-                              </IconButton>
-                            </Menu.Trigger>
-                            <Portal>
-                              <Menu.Positioner>
-                                <Menu.Content minW="180px">
-                                  <Menu.Item
-                                    value="change-role"
-                                    onSelect={() =>
-                                      setEditingRole({
-                                        id: user.id,
-                                        email: user.email,
-                                        role: coerceRole(user.role) ?? "USER",
-                                      })
-                                    }
-                                  >
-                                    Change role
-                                  </Menu.Item>
-                                  <Menu.Item
-                                    value="reset-password"
-                                    onSelect={() =>
-                                      setResetting({
-                                        id: user.id,
-                                        email: user.email,
-                                      })
-                                    }
-                                  >
-                                    Reset password
-                                  </Menu.Item>
-                                  <Menu.Separator />
-                                  <Menu.Item
-                                    value="delete"
-                                    color="red.fg"
-                                    _hover={{ bg: "red.subtle" }}
-                                    onSelect={() =>
-                                      setDeleting({
-                                        id: user.id,
-                                        email: user.email,
-                                      })
-                                    }
-                                  >
-                                    Delete user
-                                  </Menu.Item>
-                                </Menu.Content>
-                              </Menu.Positioner>
-                            </Portal>
-                          </Menu.Root>
-                        </Table.Cell>
-                      )}
-                    </Table.Row>
-                  );
-                })
+        <DataTable
+          columnCount={canManage ? 6 : 5}
+          isEmpty={rows.length === 0}
+          emptyMessage="No users match the filter."
+          header={
+            <>
+              {sortableHeader("id", "User ID")}
+              {sortableHeader("email", "Email")}
+              {sortableHeader("role", "Role")}
+              {sortableHeader("createdAt", "Created")}
+              {sortableHeader("updatedAt", "Updated")}
+              {canManage && (
+                <Table.ColumnHeader textAlign="end">Actions</Table.ColumnHeader>
               )}
-            </Table.Body>
-          </Table.Root>
-        </Box>
+            </>
+          }
+        >
+          {rows.map((user) => (
+            <Table.Row key={user.id}>
+              <Table.Cell fontFamily="mono" fontSize="xs" color="fg.muted">
+                {user.id}
+              </Table.Cell>
+              <Table.Cell>{user.email}</Table.Cell>
+              <Table.Cell>
+                <RoleBadge role={user.role} />
+              </Table.Cell>
+              <Table.Cell>{formatDateTime(user.createdAt)}</Table.Cell>
+              <Table.Cell>{formatDateTime(user.updatedAt)}</Table.Cell>
+              {canManage && (
+                <Table.Cell textAlign="end">
+                  <Menu.Root>
+                    <Menu.Trigger asChild>
+                      <IconButton variant="ghost" aria-label="User actions">
+                        <MoreVertical size={16} aria-hidden />
+                      </IconButton>
+                    </Menu.Trigger>
+                    <Portal>
+                      <Menu.Positioner>
+                        <Menu.Content minW="180px">
+                          <Menu.Item
+                            value="change-role"
+                            onSelect={() =>
+                              setEditingRole({
+                                id: user.id,
+                                email: user.email,
+                                role: coerceRole(user.role) ?? "USER",
+                              })
+                            }
+                          >
+                            Change role
+                          </Menu.Item>
+                          <Menu.Item
+                            value="reset-password"
+                            onSelect={() =>
+                              setResetting({
+                                id: user.id,
+                                email: user.email,
+                              })
+                            }
+                          >
+                            Reset password
+                          </Menu.Item>
+                          <Menu.Separator />
+                          <Menu.Item
+                            value="delete"
+                            color="red.fg"
+                            _hover={{ bg: "red.subtle" }}
+                            onSelect={() =>
+                              setDeleting({
+                                id: user.id,
+                                email: user.email,
+                              })
+                            }
+                          >
+                            Delete user
+                          </Menu.Item>
+                        </Menu.Content>
+                      </Menu.Positioner>
+                    </Portal>
+                  </Menu.Root>
+                </Table.Cell>
+              )}
+            </Table.Row>
+          ))}
+        </DataTable>
       )}
 
       <ChangeRoleDialog
