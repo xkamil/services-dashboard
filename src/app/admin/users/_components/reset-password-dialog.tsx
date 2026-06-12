@@ -5,7 +5,11 @@ import { Button, Clipboard, Code, HStack, Stack, Text } from "@chakra-ui/react";
 import { showErrorToast, showSuccessToast } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
-import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
+import {
+  AppDialog,
+  DialogActions,
+  useLastValue,
+} from "~/app/_components/dialog-utils";
 
 type ResettingUser = { id: string; email: string };
 
@@ -51,22 +55,17 @@ export function ResetPasswordDialog({ user, onClose }: Props) {
         generatedPassword ? (
           <Button onClick={handleClose}>Done</Button>
         ) : (
-          <>
-            <Button variant="ghost" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button
-              colorPalette="orange"
-              loading={resetPassword.isPending}
-              onClick={() => {
-                if (displayUser) {
-                  resetPassword.mutate({ userId: displayUser.id });
-                }
-              }}
-            >
-              Reset password
-            </Button>
-          </>
+          <DialogActions
+            onCancel={handleClose}
+            confirmLabel="Reset password"
+            confirmPalette="orange"
+            loading={resetPassword.isPending}
+            onConfirm={() => {
+              if (displayUser) {
+                resetPassword.mutate({ userId: displayUser.id });
+              }
+            }}
+          />
         )
       }
     >

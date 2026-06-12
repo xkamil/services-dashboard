@@ -1,11 +1,15 @@
 "use client";
 
-import { Button, Text } from "@chakra-ui/react";
+import { Text } from "@chakra-ui/react";
 
 import { showErrorToast, showSuccessToast } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
-import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
+import {
+  AppDialog,
+  DialogActions,
+  useLastValue,
+} from "~/app/_components/dialog-utils";
 
 type DeletingUser = { id: string; email: string };
 
@@ -46,22 +50,17 @@ export function DeleteUserDialog({ user, onClose }: Props) {
       title="Delete user"
       role="alertdialog"
       footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorPalette="red"
-            loading={deleteUser.isPending}
-            onClick={() => {
-              if (displayUser) {
-                deleteUser.mutate({ userId: displayUser.id });
-              }
-            }}
-          >
-            Delete
-          </Button>
-        </>
+        <DialogActions
+          onCancel={onClose}
+          confirmLabel="Delete"
+          confirmPalette="red"
+          loading={deleteUser.isPending}
+          onConfirm={() => {
+            if (displayUser) {
+              deleteUser.mutate({ userId: displayUser.id });
+            }
+          }}
+        />
       }
     >
       <Text>

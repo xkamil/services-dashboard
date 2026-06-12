@@ -4,7 +4,11 @@ import { Button, HStack, Stack, Table, Text } from "@chakra-ui/react";
 import { useState } from "react";
 
 import { DataTable } from "~/app/_components/data-table";
-import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
+import {
+  AppDialog,
+  DialogActions,
+  useLastValue,
+} from "~/app/_components/dialog-utils";
 import { SkeletonRows } from "~/app/_components/skeleton-rows";
 import { formatDateTime } from "~/lib/format";
 import { showErrorToast, showSuccessToast } from "~/lib/toast";
@@ -51,18 +55,15 @@ function RevertDialog({
       title="Revert configuration"
       role="alertdialog"
       footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorPalette="orange"
-            loading={revert.isPending}
-            onClick={() => display && revert.mutate({ version: display.version })}
-          >
-            Revert
-          </Button>
-        </>
+        <DialogActions
+          onCancel={onClose}
+          confirmLabel="Revert"
+          confirmPalette="orange"
+          loading={revert.isPending}
+          onConfirm={() =>
+            display && revert.mutate({ version: display.version })
+          }
+        />
       }
     >
       <Text fontSize="sm" color="fg.muted">

@@ -1,6 +1,12 @@
 "use client";
 
-import { Dialog, Portal, type DialogContentProps } from "@chakra-ui/react";
+import {
+  Button,
+  Dialog,
+  Portal,
+  type ButtonProps,
+  type DialogContentProps,
+} from "@chakra-ui/react";
 import { useRef, type ReactNode } from "react";
 
 /**
@@ -11,6 +17,41 @@ export function useLastValue<T>(value: T | null): T | null {
   const ref = useRef<T | null>(null);
   if (value) ref.current = value;
   return value ?? ref.current;
+}
+
+/** Standard dialog footer: ghost Cancel next to a colored Confirm button. */
+export function DialogActions({
+  onCancel,
+  cancelLabel = "Cancel",
+  onConfirm,
+  confirmLabel,
+  confirmPalette = "blue",
+  loading,
+  disabled,
+}: {
+  onCancel: () => void;
+  cancelLabel?: string;
+  onConfirm: () => void;
+  confirmLabel: string;
+  confirmPalette?: ButtonProps["colorPalette"];
+  loading?: boolean;
+  disabled?: boolean;
+}) {
+  return (
+    <>
+      <Button variant="ghost" onClick={onCancel}>
+        {cancelLabel}
+      </Button>
+      <Button
+        colorPalette={confirmPalette}
+        loading={loading}
+        disabled={disabled}
+        onClick={onConfirm}
+      >
+        {confirmLabel}
+      </Button>
+    </>
+  );
 }
 
 /** Shared modal shell: backdrop, positioner, header/body/footer layout. */
