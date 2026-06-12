@@ -1,17 +1,15 @@
 "use client";
 
-import { HStack, NativeSelect, Stack, Text, Wrap } from "@chakra-ui/react";
+import { Stack, Text, Wrap } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
-import { ClearFiltersButton } from "~/app/_components/clear-filters-button";
 import { IconLink } from "~/app/_components/icon-link";
-import { RefreshButton } from "~/app/_components/refresh-button";
-import { SearchInput } from "~/app/_components/search-input";
 import type { ResolvedEnvironment } from "~/lib/config/resolve";
 import { type Comparison, compareVersions } from "~/lib/version";
 import { api } from "~/trpc/react";
+import { EnvironmentToolbar } from "./environment-toolbar";
 import { ServiceCard } from "./service-card";
-import { VersionFilter, type VersionFilterValue } from "./version-filter";
+import { type VersionFilterValue } from "./version-filter";
 
 /** Renders a label→url map as a wrap of icon links, separated below by a line. */
 function Links({ links }: { links: Record<string, string> }) {
@@ -130,54 +128,20 @@ export function EnvironmentPanel({ env }: { env: ResolvedEnvironment }) {
         <Text color="fg.muted">No services configured for this environment.</Text>
       ) : (
         <Stack gap={3}>
-          <HStack gap={3} align="center" w="full">
-            <HStack
-              gap={3}
-              align="center"
-              w="full"
-              maxW={{ base: "full", md: "2xl" }}
-            >
-              <SearchInput
-                flex="1"
-                size="md"
-                value={nameFilter}
-                onChange={setNameFilter}
-                placeholder="filter by name..."
-              />
-              <NativeSelect.Root flex="1" size="md">
-                <NativeSelect.Field
-                  placeholder="filter by owner..."
-                  value={ownerFilter}
-                  onChange={(e) => setOwnerFilter(e.currentTarget.value)}
-                  color={ownerFilter === "" ? "fg.muted" : undefined}
-                >
-                  {owners.map(({ owner, count }) => (
-                    <option key={owner} value={owner}>
-                      {owner} ({count})
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-                <NativeSelect.Indicator />
-              </NativeSelect.Root>
-              <VersionFilter
-                value={versionFilter}
-                onChange={setVersionFilter}
-                counts={versionCounts}
-              />
-              <ClearFiltersButton
-                size="md"
-                activeFilterCount={activeFilterCount}
-                onClear={clearAllFilters}
-              />
-            </HStack>
-            <RefreshButton
-              size="md"
-              flex="none"
-              ms="auto"
-              loading={anyVersionFetching}
-              onRefresh={() => void utils.version.getForService.invalidate()}
-            />
-          </HStack>
+          <EnvironmentToolbar
+            nameFilter={nameFilter}
+            onNameFilterChange={setNameFilter}
+            ownerFilter={ownerFilter}
+            onOwnerFilterChange={setOwnerFilter}
+            versionFilter={versionFilter}
+            onVersionFilterChange={setVersionFilter}
+            owners={owners}
+            versionCounts={versionCounts}
+            activeFilterCount={activeFilterCount}
+            onClearAll={clearAllFilters}
+            refreshing={anyVersionFetching}
+            onRefresh={() => void utils.version.getForService.invalidate()}
+          />
 
           {filteredServices.length === 0 ? (
             <Text color="fg.muted">No services match the current filters.</Text>
