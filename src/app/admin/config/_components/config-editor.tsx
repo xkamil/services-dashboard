@@ -17,7 +17,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useMemo, useState } from "react";
 
 import { appConfigSchema } from "~/lib/config/schema";
-import { showErrorToast, showSuccessToast } from "~/lib/toast";
+import { toastMutationOptions } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
 // Monaco bundles a heavy editor that only runs in the browser, so load it
@@ -74,25 +74,23 @@ export function ConfigEditor() {
     [text],
   );
 
-  const save = api.admin.config.save.useMutation({
-    onSuccess: async (result) => {
-      await Promise.all([
-        utils.admin.config.getCurrent.invalidate(),
-        utils.admin.config.history.invalidate(),
-        utils.admin.config.getResolved.invalidate(),
-      ]);
-      setMessage("");
-      showSuccessToast("Configuration saved", {
-        description: `Saved as version ${result.version}.`,
-      });
-    },
-    onError: (error) => {
-      showErrorToast("Could not save configuration", {
-        description: "The configuration was not saved. Please try again.",
-        details: error.message,
-      });
-    },
-  });
+  const save = api.admin.config.save.useMutation(
+    toastMutationOptions({
+      successTitle: "Configuration saved",
+      successDescription: (result: { version: number }) =>
+        `Saved as version ${result.version}.`,
+      errorTitle: "Could not save configuration",
+      errorDescription: "The configuration was not saved. Please try again.",
+      onDone: async () => {
+        await Promise.all([
+          utils.admin.config.getCurrent.invalidate(),
+          utils.admin.config.history.invalidate(),
+          utils.admin.config.getResolved.invalidate(),
+        ]);
+        setMessage("");
+      },
+    }),
+  );
 
   const canSave = validation?.ok === true && !save.isPending;
 

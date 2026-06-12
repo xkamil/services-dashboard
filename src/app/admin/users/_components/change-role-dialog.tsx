@@ -4,7 +4,7 @@ import { Field, NativeSelect, Stack, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 import { ROLE_META, type Role } from "~/lib/roles";
-import { showErrorToast, showSuccessToast } from "~/lib/toast";
+import { toastMutationOptions } from "~/lib/toast";
 import { roleSchema } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
 
@@ -35,24 +35,21 @@ export function ChangeRoleDialog({ user, onClose }: Props) {
   }, [user]);
 
   const utils = api.useUtils();
-  const updateRole = api.admin.users.updateRole.useMutation({
-    onSuccess: async () => {
-      await utils.admin.users.list.invalidate();
-      const email = displayUser?.email;
-      onClose();
-      showSuccessToast("Role updated", {
-        description: email
-          ? `${email} is now ${ROLE_META[role].label}.`
-          : undefined,
-      });
-    },
-    onError: (error) => {
-      showErrorToast("Could not update role", {
-        description: "Failed to update the user role. Please try again.",
-        details: error.message,
-      });
-    },
-  });
+  const updateRole = api.admin.users.updateRole.useMutation(
+    toastMutationOptions({
+      successTitle: "Role updated",
+      successDescription: () => {
+        const email = displayUser?.email;
+        return email ? `${email} is now ${ROLE_META[role].label}.` : undefined;
+      },
+      errorTitle: "Could not update role",
+      errorDescription: "Failed to update the user role. Please try again.",
+      onDone: async () => {
+        await utils.admin.users.list.invalidate();
+        onClose();
+      },
+    }),
+  );
 
   const isUnchanged = !displayUser || role === displayUser.role;
 

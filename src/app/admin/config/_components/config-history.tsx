@@ -11,7 +11,7 @@ import {
 } from "~/app/_components/dialog-utils";
 import { SkeletonRows } from "~/app/_components/skeleton-rows";
 import { formatDateTime } from "~/lib/format";
-import { showErrorToast, showSuccessToast } from "~/lib/toast";
+import { toastMutationOptions } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
 import { ConfigDiffDialog } from "./config-diff-dialog";
@@ -28,25 +28,23 @@ function RevertDialog({
   const display = useLastValue(target);
   const utils = api.useUtils();
 
-  const revert = api.admin.config.revert.useMutation({
-    onSuccess: async (result) => {
-      await Promise.all([
-        utils.admin.config.getCurrent.invalidate(),
-        utils.admin.config.history.invalidate(),
-        utils.admin.config.getResolved.invalidate(),
-      ]);
-      onClose();
-      showSuccessToast("Configuration reverted", {
-        description: `Restored v${display?.version} as version ${result.version}.`,
-      });
-    },
-    onError: (error) => {
-      showErrorToast("Could not revert", {
-        description: "The configuration was not reverted. Please try again.",
-        details: error.message,
-      });
-    },
-  });
+  const revert = api.admin.config.revert.useMutation(
+    toastMutationOptions({
+      successTitle: "Configuration reverted",
+      successDescription: (result: { version: number }) =>
+        `Restored v${display?.version} as version ${result.version}.`,
+      errorTitle: "Could not revert",
+      errorDescription: "The configuration was not reverted. Please try again.",
+      onDone: async () => {
+        await Promise.all([
+          utils.admin.config.getCurrent.invalidate(),
+          utils.admin.config.history.invalidate(),
+          utils.admin.config.getResolved.invalidate(),
+        ]);
+        onClose();
+      },
+    }),
+  );
 
   return (
     <AppDialog
