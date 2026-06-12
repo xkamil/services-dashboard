@@ -57,11 +57,11 @@ UX verdict: the UI is consistent and close to stock Chakra — no "customization
 
 ### Phase 4 — Server hardening & cleanup
 
-- [ ] **Rate-limit public auth procedures** (high priority): add a small in-memory sliding-window limiter (per IP + per email) as tRPC middleware on `auth.login` / `auth.register` in `src/server/api/routers/auth.ts`; return `TOO_MANY_REQUESTS`. Document the single-instance limitation (cookie sessions already assume shared-nothing scaling; note Redis as the scale-out path).
-- [ ] **Stop email enumeration**: make `register` return a generic failure instead of `EMAIL_TAKEN` (`auth.ts:22-24`); update `register/page.tsx` error mapping and `tests/auth.test.ts`.
-- [ ] **Split `admin.ts` router** into `src/server/api/routers/admin/{index,users,audit}.ts` (config router already separate).
-- [ ] **Split `lib/config/schema.ts`**: keep pure Zod shapes in `schema.ts`, move the `superRefine` cross-reference/duplicate checks to `lib/config/validate.ts`; re-export so callers don't change.
-- [ ] **Error helpers** (optional, low value): `src/server/api/errors.ts` with `notFound()`, `conflict()` etc. to replace repeated inline `TRPCError` construction.
+- [skipped] **Rate-limit public auth procedures** — skipped at the owner's request (2026-06-12).
+- [x] **Stop email enumeration**: `register` now fails with generic `BAD_REQUEST`/`REGISTRATION_FAILED`; register page and tests updated.
+- [x] **Split `admin.ts` router** into `src/server/api/routers/admin/{index,users,audit}.ts` (config router already separate).
+- [x] **Split `lib/config/schema.ts`**: pure Zod shapes stay in `schema.ts`; the cross-reference/duplicate checks moved to `refineAppConfig` in `lib/config/validate.ts` (applied via `superRefine`, so callers are unchanged).
+- [skipped] **Error helpers** — evaluated and dropped: only 5 one-line `TRPCError` sites remain, each with a different code; a helper module would add indirection without removing duplication.
 
 ### Phase 5 — Tests for the changes
 
