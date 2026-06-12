@@ -11,6 +11,8 @@
 
 import { z } from "zod";
 
+import { refineAppConfig } from "./validate";
+
 /** Bumped when the document shape changes in a non-backward-compatible way. */
 export const CURRENT_SCHEMA_VERSION = 1 as const;
 
@@ -111,47 +113,8 @@ export const appConfigSchema = z
     environments: z.array(environmentSchema).default([]),
     services: z.array(serviceSchema).default([]),
   })
-  .superRefine((config, ctx) => {
-    const dupe = (values: string[]) => {
-      const seen = new Set<string>();
-      const dupes = new Set<string>();
-      for (const v of values) {
-        if (seen.has(v)) dupes.add(v);
-        seen.add(v);
-      }
-      return dupes;
-    };
-
-    for (const name of dupe(config.environments.map((e) => e.name))) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Duplicate environment name: ${name}`,
-        path: ["environments"],
-      });
-    }
-
-    const serviceNames = new Set(config.services.map((s) => s.name));
-    for (const name of dupe(config.services.map((s) => s.name))) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Duplicate service name: ${name}`,
-        path: ["services"],
-      });
-    }
-
-    // Every service an environment overrides must exist.
-    config.environments.forEach((env, envIdx) => {
-      env.services.forEach((svc, svcIdx) => {
-        if (!serviceNames.has(svc.name)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Environment "${env.name}" overrides unknown service "${svc.name}"`,
-            path: ["environments", envIdx, "services", svcIdx, "name"],
-          });
-        }
-      });
-    });
-  });
+  // Uniqueness and cross-reference rules live in ./validate.
+  .superRefine(refineAppConfig);
 
 export type ServiceLinks = z.infer<typeof serviceLinksSchema>;
 export type ServiceBase = z.infer<typeof serviceBaseSchema>;
