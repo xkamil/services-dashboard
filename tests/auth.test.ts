@@ -42,7 +42,7 @@ describe("auth.register", () => {
     expect(user.role).toBe("USER");
   });
 
-  it("rejects a duplicate email with CONFLICT", async () => {
+  it("rejects a duplicate email with a generic error (anti-enumeration)", async () => {
     await createUser({ email: "taken@test.local" });
     const { caller } = createTestCaller();
 
@@ -51,7 +51,10 @@ describe("auth.register", () => {
         email: "taken@test.local",
         password: "password123",
       }),
-    ).rejects.toMatchObject({ code: "CONFLICT", message: "EMAIL_TAKEN" });
+    ).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: "REGISTRATION_FAILED",
+    });
   });
 });
 

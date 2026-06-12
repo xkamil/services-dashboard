@@ -20,7 +20,12 @@ export const authRouter = createTRPCRouter({
         where: { email: input.email },
       });
       if (existing) {
-        throw new TRPCError({ code: "CONFLICT", message: "EMAIL_TAKEN" });
+        // Deliberately generic: confirming the email is taken would let
+        // anyone probe which addresses have accounts.
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "REGISTRATION_FAILED",
+        });
       }
 
       const userCount = await ctx.db.user.count();
