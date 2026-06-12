@@ -10,18 +10,15 @@ import {
   Table,
   Text,
 } from "@chakra-ui/react";
-import {
-  ChevronDown,
-  ChevronsUpDown,
-  ChevronUp,
-  MoreVertical,
-} from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { RefreshButton } from "~/app/_components/refresh-button";
 import { RoleBadge } from "~/app/_components/role-badge";
 import { SearchInput } from "~/app/_components/search-input";
 import { SkeletonRows } from "~/app/_components/skeleton-rows";
+import { SortableColumnHeader } from "~/app/_components/sortable-header";
+import { useTableSort } from "~/app/_components/use-table-sort";
 import { formatDateTime } from "~/lib/format";
 import { coerceRole, hasMinRole, type Role } from "~/lib/roles";
 import { api } from "~/trpc/react";
@@ -31,29 +28,10 @@ import { DeleteUserDialog } from "./delete-user-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
 
 type SortField = "id" | "email" | "role" | "createdAt" | "updatedAt";
-type SortDir = "asc" | "desc";
 
 type EditingRoleUser = { id: string; email: string; role: Role };
 type DeletingUser = { id: string; email: string };
 type ResettingUser = { id: string; email: string };
-
-function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active)
-    return (
-      <Box as="span" opacity={0.4} display="inline-flex">
-        <ChevronsUpDown size={14} aria-hidden />
-      </Box>
-    );
-  return (
-    <Box as="span" display="inline-flex">
-      {dir === "asc" ? (
-        <ChevronUp size={14} aria-hidden />
-      ) : (
-        <ChevronDown size={14} aria-hidden />
-      )}
-    </Box>
-  );
-}
 
 export function UsersTable() {
   const {
@@ -65,61 +43,36 @@ export function UsersTable() {
   const { data: session } = api.auth.me.useQuery();
   const canManage = !!session && hasMinRole(session.role, "SUPER_ADMIN");
 
-  const [sortField, setSortField] = useState<SortField>("createdAt");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filter, setFilter] = useState("");
   const [editingRole, setEditingRole] = useState<EditingRoleUser | null>(null);
   const [deleting, setDeleting] = useState<DeletingUser | null>(null);
   const [resetting, setResetting] = useState<ResettingUser | null>(null);
 
-  const rows = useMemo(() => {
+  const filtered = useMemo(() => {
     if (!users) return [];
-
     const filterLower = filter.trim().toLowerCase();
-    const filtered = filterLower
-      ? users.filter((u) =>
-          [u.id, u.email, u.role].some((v) =>
-            v.toLowerCase().includes(filterLower),
-          ),
-        )
-      : users;
+    if (!filterLower) return users;
+    return users.filter((u) =>
+      [u.id, u.email, u.role].some((v) =>
+        v.toLowerCase().includes(filterLower),
+      ),
+    );
+  }, [users, filter]);
 
-    const sorted = [...filtered].sort((a, b) => {
-      const aVal = a[sortField];
-      const bVal = b[sortField];
-      let cmp = 0;
-      if (aVal instanceof Date && bVal instanceof Date) {
-        cmp = aVal.getTime() - bVal.getTime();
-      } else {
-        cmp = String(aVal).localeCompare(String(bVal));
-      }
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-
-    return sorted;
-  }, [users, filter, sortField, sortDir]);
-
-  const toggleSort = (field: SortField) => {
-    if (field === sortField) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortField(field);
-      setSortDir("asc");
-    }
-  };
+  const {
+    sorted: rows,
+    sortField,
+    sortDir,
+    toggleSort,
+  } = useTableSort(filtered, "createdAt", "desc");
 
   const sortableHeader = (field: SortField, label: string) => (
-    <Table.ColumnHeader
-      cursor="pointer"
-      onClick={() => toggleSort(field)}
-      _hover={{ bg: "bg.muted" }}
-      userSelect="none"
-    >
-      <HStack gap={1}>
-        <Text>{label}</Text>
-        <SortIcon active={sortField === field} dir={sortDir} />
-      </HStack>
-    </Table.ColumnHeader>
+    <SortableColumnHeader
+      label={label}
+      active={sortField === field}
+      dir={sortDir}
+      onToggle={() => toggleSort(field)}
+    />
   );
 
   return (
