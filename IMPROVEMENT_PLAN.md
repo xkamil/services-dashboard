@@ -50,7 +50,7 @@ UX verdict: the UI is consistent and close to stock Chakra — no "customization
 ### Phase 3 — Split oversized components (no behavior change)
 
 - [x] **`users-table.tsx` (272 → 152 lines)**: extract `user-actions-menu.tsx` (the `Menu.Root` block, lines 197-249) and move sorting to the Phase-2 hook; keep dialogs' state in the table.
-- [ ] **`audit-log-table.tsx` (260)**: extract row-detail rendering and filter toolbar into siblings; adopt shared table pieces.
+- [x] **`audit-log-table.tsx` (260 → 132 lines)**: extracted `audit-dates.ts` (pure date helpers), `audit-log-filters.tsx` (date-range/search toolbar incl. clamping), and `audit-log-details.tsx` (formatDetails + truncated cell).
 - [ ] **`secrets-dialog.tsx` (232)**: extract per-secret row/form into `secret-field.tsx`.
 - [ ] **`environment-panel.tsx` (204)**: extract the filter toolbar (search + owner + version-status + view options) into `environment-toolbar.tsx`.
 - [ ] **`config-history.tsx` (189)**: reuse shared table shell + `SkeletonRows`; extract revert-confirmation wiring if still large.
