@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Code,
-  Skeleton,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -14,6 +13,7 @@ import type { ConfigChange } from "~/lib/config/diff";
 import { api } from "~/trpc/react";
 
 import { AppDialog, useLastValue } from "~/app/_components/dialog-utils";
+import { SkeletonRows } from "~/app/_components/skeleton-rows";
 
 type DiffTarget = { from: number; to: number };
 
@@ -56,11 +56,7 @@ export function ConfigDiffDialog({ target, onClose }: Props) {
       }
     >
       {isLoading ? (
-        <Stack gap={2}>
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} h="8" />
-          ))}
-        </Stack>
+        <SkeletonRows count={3} h="8" />
       ) : !changes || changes.length === 0 ? (
         <Text color="fg.muted">No differences between these versions.</Text>
       ) : (

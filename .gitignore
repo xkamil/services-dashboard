@@ -49,3 +49,5 @@ yarn-error.log*
 
 # other
 *.stackdump
+# prisma generate leftovers (interrupted engine swap)
+*.node.tmp*

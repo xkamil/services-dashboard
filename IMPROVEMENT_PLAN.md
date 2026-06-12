@@ -40,7 +40,7 @@ UX verdict: the UI is consistent and close to stock Chakra — no "customization
 
 ### Phase 2 — Frontend deduplication (shared components in `src/app/_components`)
 
-- [ ] **`skeleton-rows.tsx`** — `<SkeletonRows count={4} h="10" />`; replace the 6 inline skeleton-map blocks (`users-table.tsx:141-146`, `audit-log-table.tsx:167`, `config-history.tsx:103`, `environments-index.tsx:32-36`, `environment-detail.tsx:17-21`, `config-diff-dialog.tsx:61`).
+- [x] **`skeleton-rows.tsx`** (+ `environment-skeleton.tsx` for the header+grid variant the two environment pages duplicated) — `<SkeletonRows count={4} h="10" />`; replace the 6 inline skeleton-map blocks (`users-table.tsx:141-146`, `audit-log-table.tsx:167`, `config-history.tsx:103`, `environments-index.tsx:32-36`, `environment-detail.tsx:17-21`, `config-diff-dialog.tsx:61`).
 - [ ] **`use-table-sort.ts` + `sortable-header.tsx`** — extract the sort state (`sortField`/`sortDir`/`toggleSort`), comparator, `SortIcon`, and `sortableHeader` render helper currently duplicated in `users-table.tsx:33-123` and `audit-log-table.tsx`; reuse in both tables.
 - [ ] **`data-table.tsx`** — shared shell: bordered/rounded `Box` + `Table.Root variant="line"` + empty-state row with `colSpan` + `fg.muted` message. Tables pass headers, rows, and `emptyMessage`.
 - [ ] **Extend `dialog-utils.tsx` with `DialogActions`** — `<DialogActions onCancel confirmLabel confirmPalette loading disabled onConfirm />` replacing the Cancel/Confirm footer pair repeated in `change-role-dialog.tsx`, `delete-user-dialog.tsx`, `reset-password-dialog.tsx`, `secrets-dialog.tsx`, `config-diff-dialog.tsx`.

@@ -6,7 +6,6 @@ import {
   IconButton,
   Menu,
   Portal,
-  Skeleton,
   Stack,
   Table,
   Text,
@@ -22,6 +21,7 @@ import { useMemo, useState } from "react";
 import { RefreshButton } from "~/app/_components/refresh-button";
 import { RoleBadge } from "~/app/_components/role-badge";
 import { SearchInput } from "~/app/_components/search-input";
+import { SkeletonRows } from "~/app/_components/skeleton-rows";
 import { formatDateTime } from "~/lib/format";
 import { coerceRole, hasMinRole, type Role } from "~/lib/roles";
 import { api } from "~/trpc/react";
@@ -139,11 +139,7 @@ export function UsersTable() {
       </HStack>
 
       {isLoading ? (
-        <Stack gap={2}>
-          {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} h="10" />
-          ))}
-        </Stack>
+        <SkeletonRows />
       ) : (
         <Box
           borderWidth="1px"

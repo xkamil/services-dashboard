@@ -7,7 +7,6 @@ import {
   HStack,
   Input,
   Link,
-  Skeleton,
   Stack,
   Table,
   Text,
@@ -17,6 +16,7 @@ import { useMemo, useState } from "react";
 import { AppDialog } from "~/app/_components/dialog-utils";
 import { RefreshButton } from "~/app/_components/refresh-button";
 import { SearchInput } from "~/app/_components/search-input";
+import { SkeletonRows } from "~/app/_components/skeleton-rows";
 import { formatDateTime } from "~/lib/format";
 import { MAX_AUDIT_RANGE_DAYS } from "~/lib/validation/admin";
 import { api } from "~/trpc/react";
@@ -162,11 +162,7 @@ export function AuditLogTable() {
       </HStack>
 
       {isLoading ? (
-        <Stack gap={2}>
-          {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} h="10" />
-          ))}
-        </Stack>
+        <SkeletonRows />
       ) : (
         <Box
           borderWidth="1px"
