@@ -53,7 +53,7 @@ UX verdict: the UI is consistent and close to stock Chakra — no "customization
 - [x] **`audit-log-table.tsx` (260 → 132 lines)**: extracted `audit-dates.ts` (pure date helpers), `audit-log-filters.tsx` (date-range/search toolbar incl. clamping), and `audit-log-details.tsx` (formatDetails + truncated cell).
 - [x] **`secrets-dialog.tsx` (232 → 139 lines)**: extracted per-secret row/form into `secret-field.tsx` (state stays in the dialog).
 - [x] **`environment-panel.tsx` (204 → 168 lines)**: extracted the filter toolbar (search + owner + version-status + clear + refresh) into `environment-toolbar.tsx`.
-- [ ] **`config-history.tsx` (189)**: reuse shared table shell + `SkeletonRows`; extract revert-confirmation wiring if still large.
+- [x] **`config-history.tsx` (189 → 102 lines)**: shared table shell + `SkeletonRows` adopted in Phase 2; `RevertDialog` extracted to `revert-dialog.tsx`.
 
 ### Phase 4 — Server hardening & cleanup
 
