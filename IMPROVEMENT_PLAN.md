@@ -36,7 +36,7 @@ UX verdict: the UI is consistent and close to stock Chakra — no "customization
   - Replace `src/styles/globals.css`: drop `@import "tailwindcss"` and the `@theme` block; move the Geist font into the Chakra system config in `src/app/provider.tsx` (`theme.tokens.fonts.body/heading` → `var(--font-geist-sans)`).
   - Verify: `npm run build`, visual check that the font is unchanged in light/dark mode.
 - [x] **Fix `package.json`**: rename `services-dasboard` → `services-dashboard`; remove or repoint the `db:generate` / `db:migrate` scripts (MongoDB connector has no migrate engine — keep `db:push` only).
-- [ ] **Add error surfaces**: `src/app/error.tsx`, `src/app/global-error.tsx`, `src/app/not-found.tsx` using Chakra (`EmptyState` or simple `Stack` + `Button` retry/home), consistent with existing empty states.
+- [x] **Add error surfaces**: `src/app/error.tsx`, `src/app/global-error.tsx`, `src/app/not-found.tsx` using Chakra (`EmptyState` or simple `Stack` + `Button` retry/home), consistent with existing empty states.
 
 ### Phase 2 — Frontend deduplication (shared components in `src/app/_components`)
 
