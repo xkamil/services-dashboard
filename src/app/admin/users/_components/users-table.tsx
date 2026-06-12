@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  HStack,
-  IconButton,
-  Menu,
-  Portal,
-  Stack,
-  Table,
-} from "@chakra-ui/react";
-import { MoreVertical } from "lucide-react";
+import { HStack, Stack, Table } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
 import { DataTable } from "~/app/_components/data-table";
@@ -25,6 +17,7 @@ import { api } from "~/trpc/react";
 import { ChangeRoleDialog } from "./change-role-dialog";
 import { DeleteUserDialog } from "./delete-user-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
+import { UserActionsMenu } from "./user-actions-menu";
 
 type SortField = "id" | "email" | "role" | "createdAt" | "updatedAt";
 
@@ -123,56 +116,21 @@ export function UsersTable() {
               <Table.Cell>{formatDateTime(user.updatedAt)}</Table.Cell>
               {canManage && (
                 <Table.Cell textAlign="end">
-                  <Menu.Root>
-                    <Menu.Trigger asChild>
-                      <IconButton variant="ghost" aria-label="User actions">
-                        <MoreVertical size={16} aria-hidden />
-                      </IconButton>
-                    </Menu.Trigger>
-                    <Portal>
-                      <Menu.Positioner>
-                        <Menu.Content minW="180px">
-                          <Menu.Item
-                            value="change-role"
-                            onSelect={() =>
-                              setEditingRole({
-                                id: user.id,
-                                email: user.email,
-                                role: coerceRole(user.role) ?? "USER",
-                              })
-                            }
-                          >
-                            Change role
-                          </Menu.Item>
-                          <Menu.Item
-                            value="reset-password"
-                            onSelect={() =>
-                              setResetting({
-                                id: user.id,
-                                email: user.email,
-                              })
-                            }
-                          >
-                            Reset password
-                          </Menu.Item>
-                          <Menu.Separator />
-                          <Menu.Item
-                            value="delete"
-                            color="red.fg"
-                            _hover={{ bg: "red.subtle" }}
-                            onSelect={() =>
-                              setDeleting({
-                                id: user.id,
-                                email: user.email,
-                              })
-                            }
-                          >
-                            Delete user
-                          </Menu.Item>
-                        </Menu.Content>
-                      </Menu.Positioner>
-                    </Portal>
-                  </Menu.Root>
+                  <UserActionsMenu
+                    onChangeRole={() =>
+                      setEditingRole({
+                        id: user.id,
+                        email: user.email,
+                        role: coerceRole(user.role) ?? "USER",
+                      })
+                    }
+                    onResetPassword={() =>
+                      setResetting({ id: user.id, email: user.email })
+                    }
+                    onDelete={() =>
+                      setDeleting({ id: user.id, email: user.email })
+                    }
+                  />
                 </Table.Cell>
               )}
             </Table.Row>
