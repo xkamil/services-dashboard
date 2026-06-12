@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Field,
-  HStack,
-  Input,
-  Link,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Stack, Text } from "@chakra-ui/react";
 import { useState } from "react";
 
 import { type SecretKey } from "~/lib/secrets";
@@ -18,15 +9,13 @@ import { toastMutationOptions } from "~/lib/toast";
 import { api } from "~/trpc/react";
 
 import { AppDialog } from "./dialog-utils";
+import { SecretField } from "./secret-field";
 import { useSecrets } from "./secrets-context";
 
 type Props = {
   open: boolean;
   onClose: () => void;
 };
-
-// Shown in place of a stored value, which is never sent back to the client.
-const SET_PLACEHOLDER = "••••••••••••";
 
 /**
  * Lets the signed-in user set, update, and remove their own secrets. Stored
@@ -118,109 +107,31 @@ export function SecretsDialog({ open, onClose }: Props) {
             Loading…
           </Text>
         ) : (
-          secrets.map((secret) => {
-            const draft = drafts[secret.key];
-            const isDirty = draft !== undefined && draft.length > 0;
-            const savingThis =
-              setSecret.isPending && setSecret.variables?.key === secret.key;
-            const removingThis =
-              removeSecret.isPending &&
-              removeSecret.variables?.key === secret.key;
-
-            return (
-              <Box
-                key={secret.key}
-                borderWidth="1px"
-                borderColor="border"
-                rounded="md"
-                p={3}
-              >
-                <Stack gap={2}>
-                  <Stack gap={0.5}>
-                    <Text fontSize="sm" fontWeight="medium">
-                      {secret.label}
-                    </Text>
-                    <Text fontSize="xs" color="fg.muted">
-                      {secret.description}
-                    </Text>
-                    {secret.helpUrl && (
-                      <Link
-                        href={secret.helpUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        fontSize="xs"
-                        colorPalette="blue"
-                      >
-                        How to create one
-                      </Link>
-                    )}
-                  </Stack>
-
-                  <Field.Root invalid={!!errors[secret.key]}>
-                    <Input
-                      type="password"
-                      // Stop browsers / password managers from autofilling this
-                      // field on open — an autofilled value would render as dots
-                      // and falsely mark the row as edited.
-                      autoComplete="new-password"
-                      data-1p-ignore
-                      data-lpignore="true"
-                      data-form-type="other"
-                      placeholder={secret.isSet ? SET_PLACEHOLDER : "Not set"}
-                      value={draft ?? ""}
-                      disabled={isBusy && !savingThis}
-                      onChange={(e) => {
-                        const val = e.currentTarget.value;
-                        setDrafts((d) => ({ ...d, [secret.key]: val }));
-                        if (errors[secret.key]) {
-                          setErrors(({ [secret.key]: _omit, ...rest }) => rest);
-                        }
-                      }}
-                    />
-                    <Field.ErrorText>{errors[secret.key]}</Field.ErrorText>
-                  </Field.Root>
-
-                  {isDirty ? (
-                    <HStack justify="end">
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        onClick={() => clearDraft(secret.key)}
-                        disabled={isBusy}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        colorPalette="blue"
-                        size="xs"
-                        loading={savingThis}
-                        onClick={() => handleSave(secret.key)}
-                      >
-                        Save
-                      </Button>
-                    </HStack>
-                  ) : (
-                    secret.isSet && (
-                      <HStack justify="end">
-                        <Button
-                          variant="outline"
-                          colorPalette="red"
-                          size="xs"
-                          loading={removingThis}
-                          disabled={isBusy}
-                          onClick={() =>
-                            removeSecret.mutate({ key: secret.key })
-                          }
-                        >
-                          Remove
-                        </Button>
-                      </HStack>
-                    )
-                  )}
-                </Stack>
-              </Box>
-            );
-          })
+          secrets.map((secret) => (
+            <SecretField
+              key={secret.key}
+              secret={secret}
+              draft={drafts[secret.key]}
+              error={errors[secret.key]}
+              isBusy={isBusy}
+              saving={
+                setSecret.isPending && setSecret.variables?.key === secret.key
+              }
+              removing={
+                removeSecret.isPending &&
+                removeSecret.variables?.key === secret.key
+              }
+              onDraftChange={(val) => {
+                setDrafts((d) => ({ ...d, [secret.key]: val }));
+                if (errors[secret.key]) {
+                  setErrors(({ [secret.key]: _omit, ...rest }) => rest);
+                }
+              }}
+              onCancel={() => clearDraft(secret.key)}
+              onSave={() => handleSave(secret.key)}
+              onRemove={() => removeSecret.mutate({ key: secret.key })}
+            />
+          ))
         )}
       </Stack>
     </AppDialog>
